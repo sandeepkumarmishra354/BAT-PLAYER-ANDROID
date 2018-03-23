@@ -103,7 +103,7 @@ Page
                 MouseArea
                 {
                     anchors.fill: parent
-                    onClicked: nativeUtils.openUrl("https://github.com/sandeepkumarmishra354")
+                    onClicked: nativeUtils.openUrl("https://github.com/sandeepkumarmishra354/BAT-PLAYER-ANDROID")
                 }
             }
         }
