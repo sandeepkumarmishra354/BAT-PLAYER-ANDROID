@@ -1,12 +1,14 @@
 import QtQuick 2.0
 import QtQuick.Controls 2.2 as QQCONTROL
 import VPlayApps 1.0
+import QtMultimedia 5.8
 import "AppLogic.js" as LOGIC
 
 Page
 {
     id: songPage
     title: "Library"
+
     AppTabBar
     {
         id: songTabBar
@@ -27,7 +29,6 @@ Page
     {
         id: songItemContainer
         clip: true
-        //background:
         anchors.top: songTabBar.bottom
         width: parent.width
         height: parent.height - parent.height/6
@@ -39,9 +40,13 @@ Page
                 id: songlistview
                 onSongIndex:
                 {
-                    LOGIC.playThis(index, songName, row)
+                    LOGIC.playThis(index, row)
                 }
-                onSongPath: { mainplaylist.addItem(path) }
+                onSongPath:
+                {
+                    mainplaylist.addItem(path)
+                    totalSongs++
+                }
             }
         }
         Rectangle
@@ -63,7 +68,6 @@ Page
         width: parent.width
         anchors.bottom: parent.bottom
         anchors.top: songItemContainer.bottom
-        //radius: 20
         border.color: "lightblue"
         Rectangle
         {
@@ -75,9 +79,6 @@ Page
                 GradientStop {position: 1.0; color: "#00b3b3"}
                 GradientStop {position: 0.0; color: "#008080"}
             }
-
-            //color: controlColor
-            //border.color: "blue"
             AppText
             {
                 id: songText
@@ -91,12 +92,11 @@ Page
             {
                 anchors.fill: parent
                 onClicked: {
-                    if(started)
-                        songsStack.push(playingpage)
+                     songsStack.push(playingpage)
                 }
             }
         }
-        //SongPlayerPage {id: pp}
+
         Rectangle
         {
             id: controlHolder
@@ -113,19 +113,8 @@ Page
                 color: "#00b3b3"
                 onClicked:
                 {
-                    if(started)
-                    {
-                        if(isPlaying)
-                        {
-                            batplayer.pause()
-                            playpausebtn.icon = IconType.pause
-                        }
-                        else
-                        {
-                            batplayer.play()
-                            playpausebtn.icon = IconType.play
-                        }
-                     }
+                    icon = (icon==IconType.play ? IconType.pause : IconType.play)
+                    LOGIC.playOrPause()
                 }
             }
         }
