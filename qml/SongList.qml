@@ -7,17 +7,11 @@ AppListView
 {
     id: listview
     focus: true
-    signal songIndex(int index, string songName, var row)
+    signal songIndex(int index, var row)
     signal songPath(string path)
-    property int totalSongs: 0
     readonly property string androidPath: "file:///sdcard/Music"
     readonly property string linuxPath: "/root/Music"
     property bool optionRaised: false
-
-    function returnRow(curindex)
-    {
-        return itemAt(curindex)
-    }
 
     FolderListModel
     {
@@ -43,7 +37,7 @@ AppListView
                       anchors.fill: parent
                       onPressAndHold:
                       {
-                          console.log("press and hold")
+                          //console.log("press and hold")
                           option.z = 1
                           option.visible = true
                           option.opacity = 1.0
@@ -52,12 +46,12 @@ AppListView
 
                       onClicked:
                       {
-                          listview.songIndex(index, text, parent)
+                          listview.songIndex(index, parent)
                           iconSource = IconType.play
                       }
                   }
               }
-    backgroundColor: "lightcyan"
+    backgroundColor: "#66ffff"
     emptyText.text: "No Items"
 
     SongOptions
