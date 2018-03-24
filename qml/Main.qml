@@ -8,14 +8,11 @@ import "AppLogic.js" as LOGIC
 App {
     id: root
     readonly property string controlColor: "#262673"
-    property int startTime: 0
-    property int endTime: 0
-    property int currentSongIndex: 0
-    property bool isPlaying: false
+    property string startTime: "0:0"
+    property string endTime: "0:0"
     property string currentSongName: ""
-    property bool started: false
     property string bgimage: "../assets/cyan-music.jpg"
-    property var songRow
+    property var songRow: undefined
     readonly property string keyString: "AF83995C2734BB4BD8ACD38745DB92A5690BA06E724E5
                                 3A8CA86DEA8D70D7D15C07934C78DEC3DEDA6BECC0A69
                                 E1F459A2E505BCCCC03BFE17D923BC0F475F8D8695A87
@@ -43,46 +40,6 @@ App {
     SongPlayerPage
     {
         id: playingpage
-        onPlaypausebtnClicked:
-        {
-            if(isPlaying)
-            {
-                batplayer.pause()
-                isPlaying = false
-            }
-            else
-            {
-                batplayer.play()
-                isPlaying = true
-            }
-        }
-        onPrevTrack:
-        {
-            mainplaylist.previous()
-            var src = mainplaylist.itemSource(mainplaylist.previousIndex())
-            batplayer.source = src
-            batplayer.play()
-            var srcstr = src.toString()
-            var li = srcstr.lastIndexOf("/")
-            var mp3 = srcstr.slice(++li);
-            title = mp3
-            currentSongName = mp3
-            LOGIC.setPlayingIcon()
-        }
-
-        onNextTrack:
-        {
-            mainplaylist.next()
-            var src = mainplaylist.itemSource(mainplaylist.nextIndex())
-            batplayer.source = src
-            batplayer.play()
-            var srcstr = src.toString()
-            var li = srcstr.lastIndexOf("/")
-            var mp3 = srcstr.slice(++li);
-            title = mp3
-            currentSongName = mp3
-            LOGIC.setPlayingIcon()
-        }
     }
 
     Navigation
@@ -117,16 +74,22 @@ App {
     {
         id: batplayer
         playlist: mainplaylist
-        onPlaying:
+        onPositionChanged:
         {
-            started = true
-            isPlaying = true
+            LOGIC.calculateRemTime(position)
         }
-
-        onPaused: isPlaying = false
+        onDurationChanged:
+        {
+            LOGIC.calculateTotalTime(duration)
+        }
     }
     Playlist
     {
         id: mainplaylist
+        onCurrentIndexChanged:
+        {
+            console.log("cicd")
+            LOGIC.songChanged(currentItemSource)
+        }
     }
 }
