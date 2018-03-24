@@ -1,16 +1,14 @@
 import QtQuick 2.0
 import VPlayApps 1.0
+import "AppLogic.js" as LOGIC
 
 Page
 {
     id: songplayerpage
-    title: "song name"
-    property string artist: ""
-    property int remTime: 0
-    property int totalTime: 0
-    signal playpausebtnClicked()
-    signal nextTrack()
-    signal prevTrack()
+    property string songtitle: ""
+    property string remTime: "0:0"
+    property string totalTime: "0:0"
+    title: songtitle
 
     Rectangle
     {
@@ -60,7 +58,7 @@ Page
             AppSlider
             {
                 id: songslider
-                width: parent.width - (remtime.width+totaltime.width+20)
+                width: parent.width - (remtime.width+totaltime.width+25)
                 anchors.centerIn: parent
             }
         }
@@ -87,7 +85,7 @@ Page
                     selectedColor: "#00e6e6"
                     size: dp(50)
                     icon: IconType.backward
-                    onClicked: songplayerpage.prevTrack()
+                    onClicked: LOGIC.playPrevTrack()
                 }
                 IconButton
                 {
@@ -99,7 +97,7 @@ Page
                     onClicked:
                     {
                         playpauebtn.icon = (icon == IconType.play ? IconType.pause : IconType.play)
-                        playpausebtnClicked()
+                        LOGIC.playOrPause()
                     }
                 }
                 IconButton
@@ -109,7 +107,7 @@ Page
                     selectedColor: "#00e6e6"
                     size: dp(50)
                     icon: IconType.forward
-                    onClicked: songplayerpage.nextTrack()
+                    onClicked: LOGIC.playNextTrack()
                 }
             }
         }
