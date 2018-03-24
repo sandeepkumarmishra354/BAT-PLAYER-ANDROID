@@ -6,6 +6,9 @@ Page
     id: root
     title: "About"
     backgroundColor: "#66ffff"
+    readonly property string toEmail: "sandeepkumarmishra354@gmail.com"
+    readonly property string toSubj: "BAT-PLAYER bug report"
+    property string bugMsg: ""
 
     Image
     {
@@ -87,23 +90,42 @@ Page
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: "There is no copyright or any other issue"
             }
-            AppText
+            Row
             {
-                id: gitsource
+                id: sourcebugrow
+                spacing: dp(5)
                 anchors.horizontalCenter: parent.horizontalCenter
-                text: "** For source code click below **"
-            }
-            AppText
-            {
-                id: gitAddress
-                anchors.horizontalCenter: parent.horizontalCenter
-                text: "Click here"
-                font: Font.bold
-                color: "blue"
-                MouseArea
+                AppButton
                 {
-                    anchors.fill: parent
+                    id: gitAddress
+                    text: "Source"
+                    icon: IconType.code
+                    backgroundColor: "#19194d"
                     onClicked: nativeUtils.openUrl("https://github.com/sandeepkumarmishra354/BAT-PLAYER-ANDROID")
+                }
+                AppButton
+                {
+                    id: bugbutton
+                    text: "Report bug"
+                    icon: IconType.bug
+                    backgroundColor: "#ff3333"
+                    onClicked: {nativeUtils.displayTextInput("Bug Report","Describe bug","","","Report","Cancel")}
+                }
+            }
+
+            Connections
+            {
+                target: nativeUtils
+                onTextInputFinished:
+                {
+                    if(accepted)
+                    {
+                        if(enteredText != "")
+                        {
+                            bugMsg = enteredText
+                            nativeUtils.sendEmail(toEmail, toSubj, bugMsg)
+                        }
+                    }
                 }
             }
         }
