@@ -1,18 +1,35 @@
 import VPlayApps 1.0
 import VPlay 1.0
+import VPlay 2.0
 import QtQuick 2.0
 import QtQuick.Controls 1.4
 import QtMultimedia 5.8
+import QtQuick.Window 2.3
+import QtQml 2.2
+import QtSensors 5.9
 import "AppLogic.js" as LOGIC
 
 App {
     id: root
-    readonly property string controlColor: "#262673"
-    property string startTime: "0:0"
-    property string endTime: "0:0"
-    property string currentSongName: ""
-    property string bgimage: "../assets/cyan-music.jpg"
     property var songRow: undefined
+    property int sequentialMode: Playlist.Sequential
+    property int randomMode: Playlist.Random
+    property int repeatAllMode: Playlist.Loop
+    property int repeatCurrentMode: Playlist.CurrentItemInLoop
+    property int totalDuration: 0
+    property bool isFirstTime: true
+    property int currentSongIndex: 0
+    readonly property string playIcon: IconType.play
+    property string pIcon: IconType.play
+    readonly property string pauseIcon: IconType.pause
+    readonly property string controlColor: "#262673"
+    readonly property string shuffleOnIcon: "../assets/icons/shuffle.png"
+    readonly property string shuffleOffIcon: "../assets/icons/shuffle-off.png"
+    property string shuffleIcon: shuffleOffIcon
+    property string remTime: "00:00"
+    property string totalTime: "00:00"
+    property string currentSongName: ""
+    property string bgimage: "../assets/navbar-bg.jpeg"
     readonly property string keyString: "AF83995C2734BB4BD8ACD38745DB92A5690BA06E724E5
                                 3A8CA86DEA8D70D7D15C07934C78DEC3DEDA6BECC0A69
                                 E1F459A2E505BCCCC03BFE17D923BC0F475F8D8695A87
@@ -32,9 +49,16 @@ App {
 
     onInitTheme:
     {
-        Theme.navigationBar.backgroundImageSource = bgimage
-        Theme.navigationBar.titleColor = "#001a1a"
-        Theme.tabBar.backgroundColor = "#1affff"
+        Theme.navigationBar.backgroundColor = "#212121"
+        Theme.tabBar.backgroundColor = "#212121"
+        Theme.tabBar.titleOffColor = "#9E9E9E"
+        Theme.colors.textColor = "white"
+        Theme.navigationAppDrawer.textColor = "#E1BEE7"
+        Theme.navigationAppDrawer.activeTextColor = "#E91E63"
+        Theme.navigationAppDrawer.backgroundColor = "#212121"
+        Theme.navigationAppDrawer.itemBackgroundColor = "#212121"
+        Theme.navigationAppDrawer.dividerColor = "#7B1FA2"
+        Theme.colors.scrollbarColor = "#EEEEEE"
     }
 
     SongPlayerPage
@@ -68,6 +92,18 @@ App {
                 AboutPage { id: aboutpage }
             }
         }
+
+        NavigationItem
+        {
+            id: settingsNavItem
+            icon: IconType.cogs
+            title: "Settings"
+            NavigationStack
+            {
+                id: settingsNavStack
+                SettingPage { id: settngpage }
+            }
+        }
     }
 
     MediaPlayer
@@ -77,19 +113,65 @@ App {
         onPositionChanged:
         {
             LOGIC.calculateRemTime(position)
+            LOGIC.updateSongSlider(position)
         }
         onDurationChanged:
         {
             LOGIC.calculateTotalTime(duration)
         }
+        onPaused:
+        {
+            playingpage.startAnimation = false
+            LOGIC.setPlayPauseIcon(false)
+        }
+        onPlaying:
+        {
+            if(playingpage.startAnimation == false)
+                playingpage.startAnimation = true
+            LOGIC.setPlayPauseIcon(true)
+        }
     }
     Playlist
     {
         id: mainplaylist
+        playbackMode: Playlist.Loop
         onCurrentIndexChanged:
         {
-            console.log("cicd")
             LOGIC.songChanged(currentItemSource)
+            currentSongIndex = currentIndex
         }
+        onPlaybackModeChanged: { LOGIC.setShuffleIcon(playbackMode) }
+    }
+
+    SensorGesture
+    {
+        id: gestureSensor
+        enabled: (Qt.platform.os == "android" ? true : false)
+        gestures: ["QtSensors.shake2"]
+        onDetected:
+        {
+            if(gesture === "shakeLeft")
+                LOGIC.playPrevTrack()
+            if(gesture === "shakeRight")
+                LOGIC.playNextTrack()
+            if(gesture === "shakeDown")
+                LOGIC.playOrPause()
+        }
+    }
+
+    Storage
+    {
+        id: database
+    }
+
+    onSplashScreenFinished:
+    {
+        LOGIC.check()
+    }
+
+    onClosing:
+    {
+        console.log("onClosingEvent")
+        LOGIC.saveData()
     }
 }

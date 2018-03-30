@@ -9,27 +9,64 @@ AppListView
     focus: true
     signal songIndex(int index, var row)
     signal songPath(string path)
-    readonly property string androidPath: "file:///sdcard/Music"
     readonly property string linuxPath: "/root/Music"
+    readonly property string nomusicText: "<b>Place your music files to internal storage's Music folder</b>"
     property bool optionRaised: false
+    property variant androidPath: ["file:///sdcard/Music","file:///sdcard","file:///sdcard/Downloads",
+                                   "file:///sdcard/UcDownloads","file:///storage/sdcard1",
+                                   "file:///storage/sdcard1/Music","file:///storage/sdcard1/Downloads",
+                                   "file:///storage/sdcard1/UcDownloads","file:///storage/sdcard1/shareit/audio",
+                                   "file:///sdcard/shareit/audio"]
 
-    FolderListModel
+    Repeater
     {
-        id: foldermodel
-        showDirs: false
-        caseSensitive: false
-        folder: linuxPath
-        nameFilters: ["*.mp3","*.wav","*.mp4a","*.ogg"]
+        model:
+        {
+            if(Qt.platform.os === "android")
+                return androidPath
+            if(Qt.platform.os === "linux")
+                return [linuxPath]
+        }
+
+        delegate: Item
+        {
+            Repeater
+            {
+                model: FolderListModel
+                {
+                    folder: modelData
+                    caseSensitive: false
+                    showDirs: false
+                    nameFilters: ["*.mp3","*.wav","*.ogg","*.3gpp","*.mp4a"]
+                }
+                delegate: Item
+                {
+                    Text
+                    {
+                        Component.onCompleted:
+                        {
+                            var url = fileURL.toString()
+                            mdl.append( {"fileName":fileName,"fileURL":url} )
+                        }
+                    }
+                }
+            }
+        }
     }
-    model: foldermodel
+
+    ListModel{id: mdl}
+
+    model: mdl
     delegate: SimpleRow
               {
                   property string fullpath
-                  text: fileName
+                  text: fileName.toString()
                   fullpath: fileURL
                   iconSource: IconType.music
-                  style.backgroundColor: "#66ffff"
-                  style.dividerColor: "#009999"
+                  style.backgroundColor: "#212121"
+                  style.dividerColor: "#66000000"
+                  style.textColor: "white"
+                  height: dp(70)
                   Component.onCompleted: { listview.songPath(fullpath) }
                   MouseArea
                   {
@@ -37,7 +74,7 @@ AppListView
                       anchors.fill: parent
                       onPressAndHold:
                       {
-                          //console.log("press and hold")
+                          console.log("press and hold")
                           option.z = 1
                           option.visible = true
                           option.opacity = 1.0
@@ -51,21 +88,13 @@ AppListView
                       }
                   }
               }
-    backgroundColor: "#66ffff"
-    emptyText.text: "No Items"
+
+    opacity: 0.7
+    emptyText.text: nomusicText
+    emptyText.color: "purple"
 
     SongOptions
     {
         id: option
-    }
-    Keys.onBackPressed:
-    {
-        if(optionRaised)
-        {
-            option.z = 0
-            option.visible = false
-            option.opacity = 0.0
-            optionRaised = false
-        }
     }
 }

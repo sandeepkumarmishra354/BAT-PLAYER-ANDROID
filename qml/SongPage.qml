@@ -31,10 +31,16 @@ Page
         clip: true
         anchors.top: songTabBar.bottom
         width: parent.width
-        height: parent.height - parent.height/6
+        height: parent.height - parent.height/5
         Rectangle
         {
             id: songsTab
+            Image
+            {
+                id: mainbg
+                anchors.fill: parent
+                source: "../assets/main-bg.jpg"
+            }
             SongList
             {
                 id: songlistview
@@ -45,7 +51,7 @@ Page
                 onSongPath:
                 {
                     mainplaylist.addItem(path)
-                    totalSongs++
+                    //console.log(path)
                 }
             }
         }
@@ -59,6 +65,7 @@ Page
                 model: []
                 delegate: SimpleRow {}
                 emptyText.text: "No Playlist"
+                backgroundColor: "#212121"
             }
         }
     }
@@ -68,17 +75,14 @@ Page
         width: parent.width
         anchors.bottom: parent.bottom
         anchors.top: songItemContainer.bottom
-        border.color: "lightblue"
         Rectangle
         {
             id: songNameHolder
             width: (parent.width / 2) + (parent.width / 3)
             height: parent.height
             anchors.left: parent.left
-            gradient: Gradient {
-                GradientStop {position: 1.0; color: "#00b3b3"}
-                GradientStop {position: 0.0; color: "#008080"}
-            }
+            color: "#212121"
+
             AppText
             {
                 id: songText
@@ -103,18 +107,22 @@ Page
             height: parent.height
             anchors.left: songNameHolder.right
             anchors.right: parent.right
-            color: "#b3ffff"
-            IconButton
+            color: "#212121"
+            Rectangle
             {
-                id: playpausebtn
-                anchors.fill: parent
-                size: parent.width - 20
-                icon: IconType.play
-                color: "#00b3b3"
-                onClicked:
+                anchors.centerIn: parent
+                width: playpausebtn.width
+                height: playpausebtn.height
+                border.color: "white"
+                radius: 50
+                color: "#212121"
+                IconButton
                 {
-                    icon = (icon==IconType.play ? IconType.pause : IconType.play)
-                    LOGIC.playOrPause()
+                    id: playpausebtn
+                    icon: pIcon
+                    color: "white"
+                    anchors.fill: parent
+                    onClicked: LOGIC.playOrPause()
                 }
             }
         }
