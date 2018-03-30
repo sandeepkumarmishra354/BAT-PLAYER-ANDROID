@@ -5,7 +5,7 @@ Page
 {
     id: root
     title: "About"
-    backgroundColor: "#66ffff"
+    backgroundColor: "#212121"
     readonly property string toEmail: "sandeepkumarmishra354@gmail.com"
     readonly property string toSubj: "BAT-PLAYER bug report"
     property string bugMsg: ""
@@ -25,17 +25,12 @@ Page
         width: parent.width
         anchors.top: appIcon.bottom
         anchors.bottom: parent.bottom
-        gradient: Gradient
-                  {
-                    GradientStop{position: 0.0; color: "#66ffff"}
-                    GradientStop{position: 1.0; color: "#008080"}
-                  }
+        color: "#212121"
         Column
         {
             id: descriptionColumn
             width: parent.width
             spacing: dp(10)
-            //anchors.centerIn: parent
             AppText
             {
                 id: appVersionText
@@ -99,7 +94,7 @@ Page
                 {
                     id: gitAddress
                     text: "Source"
-                    icon: IconType.code
+                    icon: IconType.github
                     backgroundColor: "#19194d"
                     onClicked: nativeUtils.openUrl("https://github.com/sandeepkumarmishra354/BAT-PLAYER-ANDROID")
                 }
