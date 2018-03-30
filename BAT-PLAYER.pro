@@ -25,6 +25,7 @@ SOURCES += main.cpp
 android {
     ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
     OTHER_FILES += android/AndroidManifest.xml       android/build.gradle
+    QT += androidextras
 }
 
 ios {
@@ -47,6 +48,7 @@ DISTFILES += \
     qml/AboutPage.qml \
     qml/SongPage.qml \
     qml/AppLogic.js \
-    qml/SongOptions.qml
+    qml/SongOptions.qml \
+    qml/SettingPage.qml
 
 RESOURCES +=
