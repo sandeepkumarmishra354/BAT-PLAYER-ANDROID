@@ -18,11 +18,13 @@ Page
         {
             id: songTabOption
             text: "Songs"
+            tabIcon: IconType.music
         }
         AppTabButton
         {
             id: playlistTabOption
             text: "Playlist"
+            tabIcon: IconType.playcircleo
         }
     }
     QQCONTROL.SwipeView
@@ -41,18 +43,31 @@ Page
                 anchors.fill: parent
                 source: "../assets/main-bg.jpg"
             }
+            SearchBar
+            {
+                id: searchbar
+                pullEnabled: true
+                target: songlistview
+                inputBackgroundColor: "#E6000000"
+                barBackgroundColor: "#66000000"
+                iconColor: "#E91E63"
+                placeHolderText: "Search song"
+                opacity: 0.0
+                Behavior on opacity
+                {
+                    NumberAnimation{duration: 200}
+                }
+                onTextChanged:
+                {
+                    LOGIC.searchSong(text)
+                }
+            }
             SongList
             {
                 id: songlistview
-                onSongIndex:
-                {
-                    LOGIC.playThis(index, row)
-                }
-                onSongPath:
-                {
-                    mainplaylist.addItem(path)
-                    //console.log(path)
-                }
+                height: parent.height - y
+                onSongIndex: LOGIC.playThis(index, row)
+                onSongPath: mainplaylist.addItem(path)
             }
         }
         Rectangle
@@ -62,8 +77,33 @@ Page
             {
                 id: playlistView
                 anchors.fill: parent
-                model: []
-                delegate: SimpleRow {}
+                model: playlistModel
+                delegate: SimpleRow
+                {
+                    text: plOption
+                    style.backgroundColor: "#212121"
+                    style.dividerColor: "#66000000"
+                    style.textColor: "white"
+                    onSelected:
+                    {
+                        playlistsongpage.title = text
+                        var songList = database.getValue(text)
+                        var songListPath = database.getValue(text+"pl")
+                        if(songList !== undefined && songListPath !== undefined)
+                        {
+                            playlistSongModel.clear()
+                            for(var i=0; i<songList.length; ++i)
+                            {
+                                var file = songList[i]
+                                var filePath = songListPath[i]
+                                playlistSongModel.append({"fileName":file,"fileURL":filePath})
+                            }
+                        }
+
+                        playlistsongpage.songModel = playlistSongModel
+                        navigationStack.push(playlistsongpage)
+                    }
+                }
                 emptyText.text: "No Playlist"
                 backgroundColor: "#212121"
             }
@@ -75,6 +115,14 @@ Page
         width: parent.width
         anchors.bottom: parent.bottom
         anchors.top: songItemContainer.bottom
+        Rectangle
+        {
+            anchors.top: parent.top
+            width: parent.width
+            z: 1
+            height: 1
+            color: "#E91E63"
+        }
         Rectangle
         {
             id: songNameHolder
@@ -96,7 +144,7 @@ Page
             {
                 anchors.fill: parent
                 onClicked: {
-                     songsStack.push(playingpage)
+                     navigationStack.push(playingpage)
                 }
             }
         }
@@ -113,9 +161,9 @@ Page
                 anchors.centerIn: parent
                 width: playpausebtn.width
                 height: playpausebtn.height
-                border.color: "white"
-                radius: 50
+                border.color: "#E91E63"
                 color: "#212121"
+                radius: 50
                 IconButton
                 {
                     id: playpausebtn

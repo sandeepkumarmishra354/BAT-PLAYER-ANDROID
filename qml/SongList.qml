@@ -6,17 +6,21 @@ import QtMultimedia 5.8
 AppListView
 {
     id: listview
-    focus: true
     signal songIndex(int index, var row)
     signal songPath(string path)
     readonly property string linuxPath: "/root/Music"
     readonly property string nomusicText: "<b>Place your music files to internal storage's Music folder</b>"
-    property bool optionRaised: false
     property variant androidPath: ["file:///sdcard/Music","file:///sdcard","file:///sdcard/Downloads",
                                    "file:///sdcard/UcDownloads","file:///storage/sdcard1",
                                    "file:///storage/sdcard1/Music","file:///storage/sdcard1/Downloads",
                                    "file:///storage/sdcard1/UcDownloads","file:///storage/sdcard1/shareit/audio",
                                    "file:///sdcard/shareit/audio"]
+    property real xAxis: (width - optionMenu.width)/2
+    property real yAxix: (height - optionMenu.height)/2
+    property real opWidth: (width) - (width/5)
+    property real opHeight: height/2
+    property real tabletSize: sp(35)
+    property real mobileSize
 
     Repeater
     {
@@ -46,7 +50,9 @@ AppListView
                         Component.onCompleted:
                         {
                             var url = fileURL.toString()
-                            mdl.append( {"fileName":fileName,"fileURL":url} )
+                            var itm = {"fileName":fileName,"fileURL":url}
+                            allSongModel.append( itm )
+                            tempModel.push(itm)
                         }
                     }
                 }
@@ -54,11 +60,10 @@ AppListView
         }
     }
 
-    ListModel{id: mdl}
-
-    model: mdl
+    model: allSongModel
     delegate: SimpleRow
               {
+                  id: simplerowDel
                   property string fullpath
                   text: fileName.toString()
                   fullpath: fileURL
@@ -66,19 +71,35 @@ AppListView
                   style.backgroundColor: "#212121"
                   style.dividerColor: "#66000000"
                   style.textColor: "white"
+                  style.fontSizeText:
+                  {
+                      if(tablet)
+                        return tabletSize
+                      else
+                        return mobileSize
+                  }
+
                   height: dp(70)
-                  Component.onCompleted: { listview.songPath(fullpath) }
-                  MouseArea
+                  Component.onCompleted:
+                  {
+                      listview.songPath(fullpath)
+                      mobileSize = style.fontSizeText
+                  }
+                  RippleMouseArea
                   {
                       id: pressarea
                       anchors.fill: parent
+                      backgroundColor: "#E5000000"
+                      centerAnimation: true
+                      pressedDuration: 800
+                      circularBackground: false
                       onPressAndHold:
                       {
                           console.log("press and hold")
-                          option.z = 1
-                          option.visible = true
-                          option.opacity = 1.0
-                          optionRaised = true
+                          selectedSongIndex = index
+                          selectedSongPath = fullpath
+                          selectedSongName = text
+                          optionMenu.open()
                       }
 
                       onClicked:
@@ -95,6 +116,10 @@ AppListView
 
     SongOptions
     {
-        id: option
+        id: optionMenu
+        y: yAxix
+        x: xAxis
+        width: opWidth
+        height: opHeight
     }
 }

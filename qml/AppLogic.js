@@ -50,6 +50,8 @@ function calculateRemTime(position)
         sec = "0"+sec
     var time = min + ":" + sec
     remTime = time
+    // set slider position
+    updateSongSlider(position)
 }
 
 function calculateTotalTime(duration)
@@ -87,26 +89,37 @@ function songChanged(src)
     playingpage.title = mp3
 }
 
-function setShuffle()
+function setRepeatShuffle(mode)
 {
-    if(mainplaylist.playbackMode !== sequentialMode)
+    switch (mode)
     {
-        mainplaylist.playbackMode = sequentialMode
-        shuffleIcon = shuffleOffIcon
-    }
-    else
-    {
-        mainplaylist.playbackMode = randomMode
-        shuffleIcon = shuffleOnIcon
-    }
-}
+        // shuffle on
+        case randomMode:
+            shuffleOn = true
+            repeatAll = repeatOne = allOff = false
+            break
 
-function setRepeat()
-{
-    if(mainplaylist.playbackMode !== repeatAllMode)
-        mainplaylist.playbackMode = repeatAllMode
-    else
-        mainplaylist.playbackMode = repeatCurrentMode
+        // repeat All songs
+        case repeatAllMode:
+            repeatAll = true
+            shuffleOn = repeatOne = allOff =  false
+            break
+
+        // repeat current song
+        case repeatCurrentMode:
+            repeatOne = true
+            repeatAll = shuffleOn = allOff = false
+            break
+
+        // play in sequence
+        case sequentialMode:
+            allOff = true
+            repeatAll = repeatOne = shuffleOn = false
+            break
+
+        default:
+            console.log("ERROR IN MODE")
+    }
 }
 
 function setPlayPauseIcon(flag)
@@ -136,7 +149,13 @@ function restorePrevious()
     if( ! isFirstTime )
     {
         mainplaylist.currentIndex = database.getValue("index")
+        mainplaylist.playbackMode = database.getValue("playbackMode")
         batplayer.seek(database.getValue("position"))
+        var playlistNames = database.getValue("playlistNames")
+        if(playlistNames !== undefined)
+        {
+            //for(var i=0; i<playlistNames.length; ++i)
+        }
     }
 }
 
@@ -144,4 +163,125 @@ function saveData()
 {
     database.setValue("index", currentSongIndex)
     database.setValue("position", batplayer.position)
+    database.setValue("playbackMode", mainplaylist.playbackMode)
+}
+
+function searchSong(text)
+{
+    if(text !== "" && text.length > 1)
+    {
+        for(var i=0; i<allSongModel.count; ++i)
+        {
+            var itm = allSongModel.get(i)
+            if(itm.fileName.search(text) !== -1)
+            {
+                allSongModel.clear()
+                mainplaylist.clear()
+                for(var j=0; tempModel.length; ++j)
+                {
+                    if(tempModel[j].fileName.search(text) !== -1)
+                    {
+                        allSongModel.append(tempModel[j])
+                    }
+                }
+            }
+        }
+    }
+    else
+    {
+        allSongModel.clear()
+        mainplaylist.clear()
+        for(var i=0; i<tempModel.length; ++i)
+        {
+            allSongModel.append(tempModel[i])
+        }
+    }
+}
+
+function removeFromTempModel(index)
+{
+    if (index !== -1)
+    {
+        tempModel.splice(index, 1);
+    }
+}
+
+function handleSongOption(index)
+{
+    if(index === 0) // play option clicked
+    {
+        console.log("play option")
+        mainplaylist.currentIndex = selectedSongIndex
+        batplayer.play()
+    }
+
+    if(index === 1) // Add to playlist option clicked
+    {
+        console.log("Add to playlist option")
+        playlistoption.open()
+    }
+
+    if(index === 2) // Share option clicked
+    {
+        console.log("Share option")
+        nativeUtils.share("Share song with",selectedSongPath)
+    }
+
+    if(index === 3) // delete option clicked
+    {
+        console.log("delete option")
+        if(mainplaylist.removeItem(selectedSongIndex) && removeId.deleteFile(selectedSongPath))
+        {
+            allSongModel.remove(selectedSongIndex)
+            LOGIC.removeFromTempModel(selectedSongIndex)
+        }
+    }
+}
+
+function createNewPlaylist(enteredText)
+{
+    if(enteredText !== "")
+    {
+        playlistModel.append({"plOption":enteredText})
+        var tmpSongList = database.getValue(enteredText)
+        var tmpSongListPath = database.getValue(enteredText+"pl")
+        if(tmpSongList === undefined && tmpSongListPath === undefined)
+        {
+            var songList = [selectedSongName]
+            var songListPath = [selectedSongPath]
+            database.setValue(enteredText, songList)
+            database.setValue(enteredText+"pl",songListPath)
+        }
+        var tmpList = database.getValue("playlistNames")
+        if(tmpList === undefined)
+        {
+            var playlistNames = [enteredText]
+            database.setValue("playlistNames",playlistNames)
+        }
+        else
+        {
+            tmpList.push(enteredText)
+            database.clearValue("playlistNames")
+            database.setValue("playlistNames",tmpList)
+        }
+    }
+}
+
+function addToThisPlaylist(plName)
+{
+    var songList = database.getValue(plName)
+    var songListPath = database.getValue(plName+"pl")
+
+    if(songList !== undefined)
+    {
+        songList.push(selectedSongName)
+        database.clearValue(plName)
+        database.setValue(plName,songList)
+    }
+    if(songListPath !== undefined)
+    {
+        songListPath.push(selectedSongPath)
+        database.clearValue(plName+"pl")
+        database.setValue(plName+"pl",songListPath)
+    }
 }

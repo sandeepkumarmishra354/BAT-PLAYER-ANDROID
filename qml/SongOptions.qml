@@ -1,39 +1,69 @@
-import QtQuick 2.0
+import QtQuick 2.9
+import QtQuick.Controls 2.2
 import VPlayApps 1.0
+import "AppLogic.js" as LOGIC
 
-Page
+Menu
 {
-    id: songoptionpage
-    backgroundColor: Qt.rgba(0,0,0, 0.75)
-    z: 0
-    visible: false
+    id: mainParent
     opacity: 0.0
-    Behavior on opacity { NumberAnimation{ duration: 300 } }
-
-    Rectangle
-    {
-        id: optionRect
-        width: parent.width - dp(80)
-        height: parent.height - dp(110)
-        anchors.centerIn: parent
-        color: "#212121"
+    Behavior on opacity {
+        NumberAnimation{duration: 400}
     }
 
-    AppListView
+    background: Rectangle
     {
-        id: optioncolumn
-        anchors.fill: optionRect
-        model: [
-            {text: "Play", icon: IconType.play},
-            {text: "Playlist", icon: IconType.pluscircle},
-            {text: "Delete", icon: IconType.remove},
-            {text: "Share", icon: IconType.share}
-        ]
-        delegate: SimpleRow
-                  {
-                      style.backgroundColor: "#212121"
-                      style.textColor: "white"
-                      style.dividerColor: "#616161"
-                  }
+        color: "#212121"
+        AppListView
+        {
+            id: list
+            anchors.fill: parent
+            model: [
+                {text: "Play", icon: IconType.play},
+                {text: "Add to playlist", icon: IconType.pluscircle},
+                {text: "Share", icon: IconType.share},
+                {text: "Delete", icon: IconType.remove}
+            ]
+            delegate: SimpleRow
+            {
+                style.backgroundColor: "#212121"
+                style.dividerColor: "#66000000"
+                style.textColor: "white"
+                onSelected:
+                {
+                    if(index == 3)
+                    {
+                        nativeUtils.displayAlertDialog("Delete","Are you sure ?","Delete","Cancel")
+                        mainParent.close()
+                    }
+                    else
+                    {
+                        LOGIC.handleSongOption(index)
+                        mainParent.close()
+                    }
+                }
+            }
+        }
+    }
+    Connections
+    {
+        target: nativeUtils
+        onAlertDialogFinished:
+        {
+            if(accepted)
+                LOGIC.handleSongOption(3)
+        }
+    }
+
+    onOpened: { opacity = 1.0 }
+    onClosed: { opacity = 0.0 }
+
+    PlaylistOption
+    {
+        id: playlistoption
+        y: yAxix
+        x: xAxis
+        width: opWidth
+        height: opHeight
     }
 }

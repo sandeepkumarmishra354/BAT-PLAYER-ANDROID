@@ -1,6 +1,7 @@
 import QtQuick 2.0
 import VPlayApps 1.0
 import QtMultimedia 5.8
+import QtQuick.Controls 1.2
 import "AppLogic.js" as LOGIC
 
 Page
@@ -11,17 +12,26 @@ Page
     property string shuffleColor: "#838D89"
     property string repeatColor: "#838D89"
     title: ""
-    //navigationBarHidden: true
 
     rightBarItem: NavigationBarItem
     {
         IconButtonBarItem
         {
             icon: IconType.ellipsisv
-            color: "blue"
-            onClicked:
+            color: "#E91E63"
+            onClicked: menu.open()
+            ThreeDotMenu
             {
-                console.log("Android Action bar")
+                id: menu
+                x: parent.width-width
+                y: parent.height
+                width:
+                {
+                    if(portrait)
+                        return songplayerpage.width/2 - 10
+                    if(landscape)
+                        return songplayerpage.width/3 - 10
+                }
             }
         }
     }
@@ -29,8 +39,6 @@ Page
     Rectangle
     {
         id: playerimageRect
-        //width: parent.width
-        //height: parent.height/2 + parent.height/3
         color: "#212121"
         anchors.fill: parent
         Image
@@ -57,7 +65,7 @@ Page
                 from: 0
                 to: 360
                 running: startAnimation
-                duration: 2000
+                duration: 5000
             }
         }
     }
@@ -66,7 +74,6 @@ Page
         id: playercontrolar
         width: parent.width
         height: parent.height/5+10
-        //anchors.top: playerimageRect.bottom
         anchors.bottom: parent.bottom
         opacity: 0.8
         layer.enabled: true
@@ -97,14 +104,14 @@ Page
                         target: remtime
                         property: "opacity"
                         to: 0.0
-                        duration: 700
+                        duration: 800
                     }
                     NumberAnimation
                     {
                         target: remtime
                         property: "opacity"
                         to: 1.0
-                        duration: 700
+                        duration: 800
                     }
                 }
             }
@@ -125,8 +132,8 @@ Page
                 anchors.centerIn: parent
                 value: sliderValue
                 smooth: true
-                knobColor: "#005c99"
-                tintedTrackColor: "#005c99"
+                knobColor: "#E91E63"
+                tintedTrackColor: "#E91E63"
                 onMoved:
                 {
                     LOGIC.setSongPosition(position)
@@ -149,7 +156,7 @@ Page
                 {
                     width: prevbtn.width
                     height: prevbtn.height
-                    border.color: "white"
+                    border.color: "#E91E63"
                     radius: 50
                     color: "#212121"
                     IconButton
@@ -164,7 +171,7 @@ Page
                 {
                     width: playpausebtn.width
                     height: playpausebtn.height
-                    border.color: "white"
+                    border.color: "#E91E63"
                     color: "#212121"
                     radius: 50
                     IconButton
@@ -179,9 +186,9 @@ Page
                 {
                     width: nextbtn.width
                     height: nextbtn.height
-                    border.color: "white"
-                    radius: 50
+                    border.color: "#E91E63"
                     color: "#212121"
+                    radius: 50
                     IconButton
                     {
                         id: nextbtn

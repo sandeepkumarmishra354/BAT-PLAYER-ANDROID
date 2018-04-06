@@ -1,5 +1,4 @@
 import VPlayApps 1.0
-import VPlay 1.0
 import VPlay 2.0
 import QtQuick 2.0
 import QtQuick.Controls 1.4
@@ -7,30 +6,40 @@ import QtMultimedia 5.8
 import QtQuick.Window 2.3
 import QtQml 2.2
 import QtSensors 5.9
+import RemoveFile 1.0
 import "AppLogic.js" as LOGIC
 
 App {
+    // All fixed properties
     id: root
-    property var songRow: undefined
-    property int sequentialMode: Playlist.Sequential
-    property int randomMode: Playlist.Random
-    property int repeatAllMode: Playlist.Loop
-    property int repeatCurrentMode: Playlist.CurrentItemInLoop
-    property int totalDuration: 0
-    property bool isFirstTime: true
-    property int currentSongIndex: 0
+    readonly property int sequentialMode: Playlist.Sequential
+    readonly property int randomMode: Playlist.Random
+    readonly property int repeatAllMode: Playlist.Loop
+    readonly property int repeatCurrentMode: Playlist.CurrentItemInLoop
     readonly property string playIcon: IconType.play
-    property string pIcon: IconType.play
     readonly property string pauseIcon: IconType.pause
     readonly property string controlColor: "#262673"
     readonly property string shuffleOnIcon: "../assets/icons/shuffle.png"
     readonly property string shuffleOffIcon: "../assets/icons/shuffle-off.png"
-    property string shuffleIcon: shuffleOffIcon
+    // All changable properties
+    property string pIcon: IconType.play
+    property var songRow: undefined
+    property int totalDuration: 0
+    property bool isFirstTime: true
+    property int currentSongIndex: 0
+    property string bgimage: "../assets/navbar-bg.jpeg"
     property string remTime: "00:00"
     property string totalTime: "00:00"
     property string currentSongName: ""
-    property string bgimage: "../assets/navbar-bg.jpeg"
-    readonly property string keyString: "AF83995C2734BB4BD8ACD38745DB92A5690BA06E724E5
+    property bool shuffleOn: false
+    property bool allOff: true
+    property bool repeatAll: false
+    property bool repeatOne: false
+    property string selectedSongPath: ""
+    property string selectedSongName: ""
+    property int selectedSongIndex: -1
+    property var tempModel: []
+    readonly property string licenseKeyString: "AF83995C2734BB4BD8ACD38745DB92A5690BA06E724E5
                                 3A8CA86DEA8D70D7D15C07934C78DEC3DEDA6BECC0A69
                                 E1F459A2E505BCCCC03BFE17D923BC0F475F8D8695A87
                                 66C234491D8D66B8078E9D1F3E25F8B3ADE396DB04CC0
@@ -45,7 +54,15 @@ App {
                                 FDAB3A6D6E5ECB64BCBCD64CC434734B00A015546B4C6
                                 13246ECA3BE90B893F8815D"
 
-    licenseKey: keyString
+    licenseKey: licenseKeyString
+
+    ListModel { id: allSongModel } // model of main song list
+    ListModel { id: playlistModel } // model of playlist names
+    ListModel { id: playlistSongModel } // model of playlist songs
+    Storage { id: database; clearAllAtStartup: true } // settings storage
+    RemoveFile { id: removeId } // delete song by this c++ type
+    SongPlayerPage { id: playingpage } // main playing page
+    PlaylistSongPage { id: playlistsongpage} // playlist song container page
 
     onInitTheme:
     {
@@ -57,13 +74,8 @@ App {
         Theme.navigationAppDrawer.activeTextColor = "#E91E63"
         Theme.navigationAppDrawer.backgroundColor = "#212121"
         Theme.navigationAppDrawer.itemBackgroundColor = "#212121"
-        Theme.navigationAppDrawer.dividerColor = "#7B1FA2"
+        Theme.navigationAppDrawer.dividerColor = "#212121"
         Theme.colors.scrollbarColor = "#EEEEEE"
-    }
-
-    SongPlayerPage
-    {
-        id: playingpage
     }
 
     Navigation
@@ -76,7 +88,7 @@ App {
             icon: IconType.music
             NavigationStack
             {
-                id: songsStack
+                id: navigationStack
                 SongPage { id: mainPage }
             }
         }
@@ -106,31 +118,6 @@ App {
         }
     }
 
-    MediaPlayer
-    {
-        id: batplayer
-        playlist: mainplaylist
-        onPositionChanged:
-        {
-            LOGIC.calculateRemTime(position)
-            LOGIC.updateSongSlider(position)
-        }
-        onDurationChanged:
-        {
-            LOGIC.calculateTotalTime(duration)
-        }
-        onPaused:
-        {
-            playingpage.startAnimation = false
-            LOGIC.setPlayPauseIcon(false)
-        }
-        onPlaying:
-        {
-            if(playingpage.startAnimation == false)
-                playingpage.startAnimation = true
-            LOGIC.setPlayPauseIcon(true)
-        }
-    }
     Playlist
     {
         id: mainplaylist
@@ -140,7 +127,42 @@ App {
             LOGIC.songChanged(currentItemSource)
             currentSongIndex = currentIndex
         }
-        onPlaybackModeChanged: { LOGIC.setShuffleIcon(playbackMode) }
+        onPlaybackModeChanged:
+        {
+            LOGIC.setRepeatShuffle(playbackMode)
+        }
+    }
+
+    MediaPlayer
+    {
+        id: batplayer
+        playlist: mainplaylist
+        onPositionChanged:
+        {
+            LOGIC.calculateRemTime(position)
+        }
+        onDurationChanged:
+        {
+            LOGIC.calculateTotalTime(duration)
+        }
+        onPaused:
+        {
+            LOGIC.setPlayPauseIcon(false)
+        }
+        onPlaying:
+        {
+            LOGIC.setPlayPauseIcon(true)
+        }
+        onSourceChanged: {console.log(source)}
+        onPlaybackStateChanged:
+        {
+            // starts rotation of Music C.D
+            if(batplayer.playbackState === Audio.PlayingState)
+                playingpage.startAnimation = true
+            // stops rotation of Music C.D
+            if(batplayer.playbackState === Audio.PausedState)
+                playingpage.startAnimation = false
+        }
     }
 
     SensorGesture
@@ -159,19 +181,12 @@ App {
         }
     }
 
-    Storage
-    {
-        id: database
-    }
-
     onSplashScreenFinished:
     {
         LOGIC.check()
     }
-
     onClosing:
     {
-        console.log("onClosingEvent")
         LOGIC.saveData()
     }
 }
