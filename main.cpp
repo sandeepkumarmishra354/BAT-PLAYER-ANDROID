@@ -1,18 +1,21 @@
 #include <QApplication>
 #include <VPApplication>
-
 #include <QQmlApplicationEngine>
-
+#include "removefile.h"
+#include "mediaextractor.h"
 
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
+    qmlRegisterType<MediaExtractor>("MediaExtractor", 1, 0, "MediaExtractor");
+    qmlRegisterType<RemoveFile>("RemoveFile", 1, 0, "RemoveFile");
     VPApplication vplay;
 
     // Use platform-specific fonts instead of V-Play's default font
     vplay.setPreservePlatformFonts(true);
 
     QQmlApplicationEngine engine;
+    //engine.rootContext()->setContextProperty("MediaExtractor", MediaExtractor);
     vplay.initialize(&engine);
 
     // use this during development
@@ -29,3 +32,4 @@ int main(int argc, char *argv[])
 
     return app.exec();
 }
+

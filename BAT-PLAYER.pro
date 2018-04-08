@@ -20,7 +20,9 @@ DEPLOYMENTFOLDERS += assetsFolder
 
 
 # The .cpp file which was generated for your project. Feel free to hack it.
-SOURCES += main.cpp
+SOURCES += main.cpp \
+    removefile.cpp \
+    mediaextractor.cpp
 
 android {
     ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
@@ -49,6 +51,50 @@ DISTFILES += \
     qml/SongPage.qml \
     qml/AppLogic.js \
     qml/SongOptions.qml \
-    qml/SettingPage.qml
+    qml/SettingPage.qml \
+    qml/ThreeDotMenu.qml \
+    qml/PlaylistOption.qml \
+    qml/PlaylistSongPage.qml \
+    qml/SearchList.qml
 
 RESOURCES +=
+
+HEADERS += \
+    removefile.h \
+    mediaextractor.h
+
+contains(ANDROID_TARGET_ARCH,armeabi-v7a) {
+    ANDROID_EXTRA_LIBS = \
+        /V-PlaySDK/V-Play/android_armv7/lib/libcrypto.so \
+        /V-PlaySDK/V-Play/android_armv7/lib/libssl.so
+}
+
+android {
+    win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../usr/TAG/lib/release/ -ltag
+    else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../usr/TAG/lib/debug/ -ltag
+    else:unix: LIBS += -L$$PWD/../../usr/TAG/lib/ -ltag
+
+    INCLUDEPATH += $$PWD/../../usr/TAG/include
+    DEPENDPATH += $$PWD/../../usr/TAG/include
+
+    win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../../usr/TAG/lib/release/libtag.a
+    else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../usr/TAG/lib/debug/libtag.a
+    else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../../usr/TAG/lib/release/tag.lib
+    else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../usr/TAG/lib/debug/tag.lib
+    else:unix: PRE_TARGETDEPS += $$PWD/../../usr/TAG/lib/libtag.a
+}
+
+unix {
+    win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../usr/local/lib/release/ -ltag
+    else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../usr/local/lib/debug/ -ltag
+    else:unix: LIBS += -L$$PWD/../../usr/local/lib/ -ltag
+
+    INCLUDEPATH += $$PWD/../../usr/local/include
+    DEPENDPATH += $$PWD/../../usr/local/include
+
+    win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../../usr/local/lib/release/libtag.a
+    else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../usr/local/lib/debug/libtag.a
+    else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../../usr/local/lib/release/tag.lib
+    else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../usr/local/lib/debug/tag.lib
+    else:unix: PRE_TARGETDEPS += $$PWD/../../usr/local/lib/libtag.a
+}
