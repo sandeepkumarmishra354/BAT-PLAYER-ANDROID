@@ -8,6 +8,8 @@ Page
 {
     id: songPage
     title: "Library"
+    property string noPlaylistText: "No playlist found, to create one long press on any song "+
+                                     "and select 'Add to playlist'"
 
     AppTabBar
     {
@@ -57,17 +59,16 @@ Page
                 {
                     NumberAnimation{duration: 200}
                 }
-                onTextChanged:
-                {
-                    LOGIC.searchSong(text)
-                }
+                onTextChanged: LOGIC.searchSong(text)
             }
             SongList
             {
                 id: songlistview
                 height: parent.height - y
                 onSongIndex: LOGIC.playThis(index, row)
-                onSongPath: mainplaylist.addItem(path)
+                onSongPath: {
+                    mainplaylist.addItem(path)
+                }
             }
         }
         Rectangle
@@ -84,27 +85,9 @@ Page
                     style.backgroundColor: "#212121"
                     style.dividerColor: "#66000000"
                     style.textColor: "white"
-                    onSelected:
-                    {
-                        playlistsongpage.title = text
-                        var songList = database.getValue(text)
-                        var songListPath = database.getValue(text+"pl")
-                        if(songList !== undefined && songListPath !== undefined)
-                        {
-                            playlistSongModel.clear()
-                            for(var i=0; i<songList.length; ++i)
-                            {
-                                var file = songList[i]
-                                var filePath = songListPath[i]
-                                playlistSongModel.append({"fileName":file,"fileURL":filePath})
-                            }
-                        }
-
-                        playlistsongpage.songModel = playlistSongModel
-                        navigationStack.push(playlistsongpage)
-                    }
+                    onSelected: LOGIC.openPlaylist(text)
                 }
-                emptyText.text: "No Playlist"
+                emptyText.text: noPlaylistText
                 backgroundColor: "#212121"
             }
         }
@@ -143,9 +126,7 @@ Page
             MouseArea
             {
                 anchors.fill: parent
-                onClicked: {
-                     navigationStack.push(playingpage)
-                }
+                onClicked: navigationStack.push(playingpage)
             }
         }
 

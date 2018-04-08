@@ -50,9 +50,10 @@ AppListView
                         Component.onCompleted:
                         {
                             var url = fileURL.toString()
-                            var itm = {"fileName":fileName,"fileURL":url}
+                            var artist = mediaextractorId.getArtist(fileURL)
+                            var itm = {"fileName":fileName,"fileURL":url,"artist":artist}
                             allSongModel.append( itm )
-                            tempModel.push(itm)
+                            tempModel.append(itm)
                         }
                     }
                 }
@@ -66,11 +67,13 @@ AppListView
                   id: simplerowDel
                   property string fullpath
                   text: fileName.toString()
+                  detailText: artist
                   fullpath: fileURL
                   iconSource: IconType.music
                   style.backgroundColor: "#212121"
                   style.dividerColor: "#66000000"
                   style.textColor: "white"
+                  style.detailTextColor: "white"//"#E91E63"
                   style.fontSizeText:
                   {
                       if(tablet)

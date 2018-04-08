@@ -40,14 +40,14 @@ Menu
                 width: parent.width/2
                 radius: 50
                 border.color: "white"
-                color: shuffleOn ? "#E91E63" : "#212121"
+                color: (shuffleOn ? "#E91E63" : "#212121")
                 anchors.centerIn: parent
             }
         }
         onToggled:
         {
             if(checked)
-            mainplaylist.playbackMode = randomMode
+                mainplaylist.playbackMode = randomMode
         }
     }
     MenuItem
@@ -78,14 +78,14 @@ Menu
                 width: parent.width/2
                 radius: 50
                 border.color: "white"
-                color: repeatOne ? "#E91E63" : "#212121"
+                color: (repeatOne ? "#E91E63" : "#212121")
                 anchors.centerIn: parent
             }
         }
         onToggled:
         {
             if(checked)
-            mainplaylist.playbackMode = repeatCurrentMode
+                mainplaylist.playbackMode = repeatCurrentMode
         }
     }
     MenuItem
@@ -116,14 +116,14 @@ Menu
                 width: parent.width/2
                 radius: 50
                 border.color: "white"
-                color: repeatAll ? "#E91E63" : "#212121"
+                color: (repeatAll ? "#E91E63" : "#212121")
                 anchors.centerIn: parent
             }
         }
         onToggled:
         {
             if(checked)
-            mainplaylist.playbackMode = repeatAllMode
+                mainplaylist.playbackMode = repeatAllMode
         }
     }
     MenuItem
@@ -154,14 +154,14 @@ Menu
                 width: parent.width/2
                 radius: 50
                 border.color: "white"
-                color: allOff ? "#E91E63" : "#212121"
+                color: (allOff ? "#E91E63" : "#212121")
                 anchors.centerIn: parent
             }
         }
         onToggled:
         {
             if(checked)
-            mainplaylist.playbackMode = sequentialMode
+                mainplaylist.playbackMode = sequentialMode
         }
     }
     onOpened: { opacity = 1.0 }

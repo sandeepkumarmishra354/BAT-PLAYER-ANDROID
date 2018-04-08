@@ -82,11 +82,14 @@ function setSongPosition(pos)
 
 function songChanged(src)
 {
-    var srcstr = src.toString()
-    var li = srcstr.lastIndexOf("/")
-    var mp3 = srcstr.slice(++li);
+    //var srcstr = src.toString()
+    //var li = srcstr.lastIndexOf("/")
+    //var mp3 = srcstr.slice(++li);
+    var mp3 = mediaextractorId.getTitle(src)
     currentSongName = mp3
     playingpage.title = mp3
+
+    currentSongIndex = mainplaylist.currentIndex
 }
 
 function setRepeatShuffle(mode)
@@ -168,8 +171,9 @@ function saveData()
 
 function searchSong(text)
 {
-    if(text !== "" && text.length > 1)
+    if(text !== "")
     {
+        //songsearchMenu.open()
         for(var i=0; i<allSongModel.count; ++i)
         {
             var itm = allSongModel.get(i)
@@ -177,11 +181,12 @@ function searchSong(text)
             {
                 allSongModel.clear()
                 mainplaylist.clear()
-                for(var j=0; tempModel.length; ++j)
+                for(var j=0; tempModel.count; ++j)
                 {
-                    if(tempModel[j].fileName.search(text) !== -1)
+                    var titm = tempModel.get(j)
+                    if(titm.fileName.search(text) !== -1)
                     {
-                        allSongModel.append(tempModel[j])
+                        allSongModel.append(titm)
                     }
                 }
             }
@@ -191,19 +196,17 @@ function searchSong(text)
     {
         allSongModel.clear()
         mainplaylist.clear()
-        for(var i=0; i<tempModel.length; ++i)
+        for(var i=0; i<tempModel.count; ++i)
         {
-            allSongModel.append(tempModel[i])
+            allSongModel.append(tempModel.get(i))
         }
+        //songsearchMenu.close()
     }
 }
 
 function removeFromTempModel(index)
 {
-    if (index !== -1)
-    {
-        tempModel.splice(index, 1);
-    }
+    tempModel.remove(index)
 }
 
 function handleSongOption(index)
@@ -284,4 +287,45 @@ function addToThisPlaylist(plName)
         database.clearValue(plName+"pl")
         database.setValue(plName+"pl",songListPath)
     }
+}
+
+function openPlaylist(plName)
+{
+    playlistsongpage.title = plName
+    var songList = database.getValue(plName)
+    var songListPath = database.getValue(plName+"pl")
+
+    if(songList !== undefined && songListPath !== undefined)
+    {
+        playlistSongModel.clear()
+        for(var i=0; i<songList.length; ++i)
+        {
+            var file = songList[i]
+            var filePath = songListPath[i]
+            playlistSongModel.append({"fileName":file,"fileURL":filePath})
+        }
+    }
+
+    playlistsongpage.songModel = playlistSongModel
+    navigationStack.push(playlistsongpage)
+}
+
+function checkGesture(gesture)
+{
+    if(gesture === "shakeLeft")
+        playPrevTrack()
+    if(gesture === "shakeRight")
+        playNextTrack()
+    if(gesture === "shakeDown")
+        playOrPause()
+}
+
+function setRotation()
+{
+    // starts rotation of Music C.D
+    if(batplayer.playbackState === Audio.PlayingState)
+        playingpage.startAnimation = true
+    // stops rotation of Music C.D
+    if(batplayer.playbackState === Audio.PausedState)
+        playingpage.startAnimation = false
 }

@@ -134,10 +134,7 @@ Page
                 smooth: true
                 knobColor: "#E91E63"
                 tintedTrackColor: "#E91E63"
-                onMoved:
-                {
-                    LOGIC.setSongPosition(position)
-                }
+                onMoved: LOGIC.setSongPosition(position)
             }
         }
         Rectangle

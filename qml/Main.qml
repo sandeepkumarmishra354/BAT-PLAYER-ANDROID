@@ -6,7 +6,8 @@ import QtMultimedia 5.8
 import QtQuick.Window 2.3
 import QtQml 2.2
 import QtSensors 5.9
-import RemoveFile 1.0
+import RemoveFile 1.0 // c++ class
+import MediaExtractor 1.0 // c++ class
 import "AppLogic.js" as LOGIC
 
 App {
@@ -38,7 +39,7 @@ App {
     property string selectedSongPath: ""
     property string selectedSongName: ""
     property int selectedSongIndex: -1
-    property var tempModel: []
+    //property var tempModel: []
     readonly property string licenseKeyString: "AF83995C2734BB4BD8ACD38745DB92A5690BA06E724E5
                                 3A8CA86DEA8D70D7D15C07934C78DEC3DEDA6BECC0A69
                                 E1F459A2E505BCCCC03BFE17D923BC0F475F8D8695A87
@@ -59,10 +60,20 @@ App {
     ListModel { id: allSongModel } // model of main song list
     ListModel { id: playlistModel } // model of playlist names
     ListModel { id: playlistSongModel } // model of playlist songs
+    ListModel { id: tempModel }
     Storage { id: database; clearAllAtStartup: true } // settings storage
     RemoveFile { id: removeId } // delete song by this c++ type
+    MediaExtractor { id: mediaextractorId }
     SongPlayerPage { id: playingpage } // main playing page
     PlaylistSongPage { id: playlistsongpage} // playlist song container page
+    SearchList
+    {
+        id: songsearchMenu
+        x: (parent.width - width)/2
+        y: (parent.height - height)/2
+        onOpened: {console.log("openned")}
+        onClosed:  {console.log("closed")}
+    }
 
     onInitTheme:
     {
@@ -122,47 +133,22 @@ App {
     {
         id: mainplaylist
         playbackMode: Playlist.Loop
-        onCurrentIndexChanged:
-        {
+        onCurrentIndexChanged:{
             LOGIC.songChanged(currentItemSource)
-            currentSongIndex = currentIndex
+            //mediaextractorId.mediaMetaData(currentItemSource)
         }
-        onPlaybackModeChanged:
-        {
-            LOGIC.setRepeatShuffle(playbackMode)
-        }
+        onPlaybackModeChanged: LOGIC.setRepeatShuffle(playbackMode)
     }
 
     MediaPlayer
     {
         id: batplayer
         playlist: mainplaylist
-        onPositionChanged:
-        {
-            LOGIC.calculateRemTime(position)
-        }
-        onDurationChanged:
-        {
-            LOGIC.calculateTotalTime(duration)
-        }
-        onPaused:
-        {
-            LOGIC.setPlayPauseIcon(false)
-        }
-        onPlaying:
-        {
-            LOGIC.setPlayPauseIcon(true)
-        }
-        onSourceChanged: {console.log(source)}
-        onPlaybackStateChanged:
-        {
-            // starts rotation of Music C.D
-            if(batplayer.playbackState === Audio.PlayingState)
-                playingpage.startAnimation = true
-            // stops rotation of Music C.D
-            if(batplayer.playbackState === Audio.PausedState)
-                playingpage.startAnimation = false
-        }
+        onPositionChanged: LOGIC.calculateRemTime(position)
+        onDurationChanged: LOGIC.calculateTotalTime(duration)
+        onPaused: LOGIC.setPlayPauseIcon(false)
+        onPlaying: LOGIC.setPlayPauseIcon(true)
+        onPlaybackStateChanged: LOGIC.setRotation()
     }
 
     SensorGesture
@@ -170,23 +156,9 @@ App {
         id: gestureSensor
         enabled: (Qt.platform.os == "android" ? true : false)
         gestures: ["QtSensors.shake2"]
-        onDetected:
-        {
-            if(gesture === "shakeLeft")
-                LOGIC.playPrevTrack()
-            if(gesture === "shakeRight")
-                LOGIC.playNextTrack()
-            if(gesture === "shakeDown")
-                LOGIC.playOrPause()
-        }
+        onDetected: LOGIC.checkGesture(gesture)
     }
 
-    onSplashScreenFinished:
-    {
-        LOGIC.check()
-    }
-    onClosing:
-    {
-        LOGIC.saveData()
-    }
+    onSplashScreenFinished: LOGIC.check()
+    onClosing: LOGIC.saveData()
 }

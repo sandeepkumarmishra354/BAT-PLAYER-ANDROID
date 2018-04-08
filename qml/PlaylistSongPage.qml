@@ -12,6 +12,7 @@ Page
     AppListView
     {
         id: playlistSongList
+        anchors.fill: parent
         backgroundColor: "#212121"
         model: songModel
         delegate: SimpleRow
