@@ -42,10 +42,10 @@ function playOrPause()
 function calculateRemTime(position)
 {
     var totalDurSec = Math.floor(position / 1000)
-    var min = Math.floor(totalDurSec/60)
+    var min = Math.floor(totalDurSec / 60)
     if(min < 10)
         min = "0"+min
-    var sec = Math.floor(totalDurSec%60)
+    var sec = Math.floor(totalDurSec % 60)
     if(sec < 10)
         sec = "0"+sec
     var time = min + ":" + sec
@@ -57,10 +57,10 @@ function calculateRemTime(position)
 function calculateTotalTime(duration)
 {
     var totalDurSec = Math.floor(duration / 1000)
-    var min = Math.floor(totalDurSec/60)
+    var min = Math.floor(totalDurSec / 60)
     if(min < 10)
         min = "0"+min
-    var sec = Math.floor(totalDurSec%60)
+    var sec = Math.floor(totalDurSec % 60)
     if(sec < 10)
         sec = "0"+sec
     var time = min + ":" + sec
@@ -82,46 +82,49 @@ function setSongPosition(pos)
 
 function songChanged(src)
 {
-    //var srcstr = src.toString()
-    //var li = srcstr.lastIndexOf("/")
-    //var mp3 = srcstr.slice(++li);
     var mp3 = mediaextractorId.getTitle(src)
     currentSongName = mp3
-    playingpage.title = mp3
-
     currentSongIndex = mainplaylist.currentIndex
 }
 
 function setRepeatShuffle(mode)
 {
-    switch (mode)
+    if(mode === "shuffle")
     {
-        // shuffle on
-        case randomMode:
-            shuffleOn = true
-            repeatAll = repeatOne = allOff = false
-            break
-
-        // repeat All songs
-        case repeatAllMode:
-            repeatAll = true
-            shuffleOn = repeatOne = allOff =  false
-            break
-
-        // repeat current song
-        case repeatCurrentMode:
-            repeatOne = true
-            repeatAll = shuffleOn = allOff = false
-            break
-
-        // play in sequence
-        case sequentialMode:
-            allOff = true
-            repeatAll = repeatOne = shuffleOn = false
-            break
-
-        default:
-            console.log("ERROR IN MODE")
+        console.log("shuffle mode")
+        if(shuffleOn)
+        {
+            mainplaylist.playbackMode = sequentialMode
+            console.log("shuffle off")
+        }
+        else
+        {
+            mainplaylist.playbackMode = randomMode
+            console.log("shuffle on")
+        }
+    }
+    if(mode === "repeat")
+    {
+        console.log("repeat mode")
+        switch (mainplaylist.playbackMode)
+        {
+            case sequentialMode:
+                mainplaylist.playbackMode = repeatCurrentMode
+                console.log("repeat curr")
+                break
+            case repeatCurrentMode:
+                mainplaylist.playbackMode = repeatAllMode
+                console.log("repeat all")
+                break
+            case repeatAllMode:
+                mainplaylist.playbackMode = sequentialMode
+                console.log("sequential")
+                break
+            default:
+                mainplaylist.playbackMode = repeatCurrentMode
+                console.log("sequential default")
+                break
+        }
     }
 }
 
@@ -173,18 +176,18 @@ function searchSong(text)
 {
     if(text !== "")
     {
-        //songsearchMenu.open()
+        var textS = new RegExp(text,"i")
         for(var i=0; i<allSongModel.count; ++i)
         {
             var itm = allSongModel.get(i)
-            if(itm.fileName.search(text) !== -1)
+            if(itm.fileName.search(textS) !== -1)
             {
                 allSongModel.clear()
                 mainplaylist.clear()
                 for(var j=0; tempModel.count; ++j)
                 {
                     var titm = tempModel.get(j)
-                    if(titm.fileName.search(text) !== -1)
+                    if(titm.fileName.search(textS) !== -1)
                     {
                         allSongModel.append(titm)
                     }
@@ -200,7 +203,6 @@ function searchSong(text)
         {
             allSongModel.append(tempModel.get(i))
         }
-        //songsearchMenu.close()
     }
 }
 
@@ -306,7 +308,6 @@ function openPlaylist(plName)
         }
     }
 
-    playlistsongpage.songModel = playlistSongModel
     navigationStack.push(playlistsongpage)
 }
 
@@ -328,4 +329,40 @@ function setRotation()
     // stops rotation of Music C.D
     if(batplayer.playbackState === Audio.PausedState)
         playingpage.startAnimation = false
+}
+
+function timerStopClicked()
+{
+    quittimer.stop()
+    clranime.stop()
+    clranimeStop.start()
+    hrtumbler.resetCurrentIndex()
+    mintumbler.resetCurrentIndex()
+    if(!onoffbtn.visible)
+    {
+        onoffbtn.visible = true
+        onoffbtn.opacity = 1.0
+    }
+}
+
+function timerOnOffClicked()
+{
+    var hr = hrtumbler.getCurrentIndex()
+    var min = mintumbler.getCurrentIndex()
+    if(hr !== 0 || min !== 0)
+    {
+        var td = ( ( (hr*60)*60 )*1000 ) + ( (min*60)*1000 )
+        timerInterval = td
+        quittimer.start()
+        clranime.duration = td
+        if(clranime.paused)
+            clranime.resume()
+        else if(clranime.running)
+            clranime.pause()
+        else
+            clranime.start()
+
+        onoffbtn.opacity = 0.0
+        onoffbtn.visible = false
+    }
 }

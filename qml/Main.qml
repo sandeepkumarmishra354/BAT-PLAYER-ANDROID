@@ -20,26 +20,29 @@ App {
     readonly property string playIcon: IconType.play
     readonly property string pauseIcon: IconType.pause
     readonly property string controlColor: "#262673"
-    readonly property string shuffleOnIcon: "../assets/icons/shuffle.png"
-    readonly property string shuffleOffIcon: "../assets/icons/shuffle-off.png"
     // All changable properties
+    property real xAxis: (width - timermenu.width)/2
+    property real yAxix: (height - timermenu.height)/2
+    property real opWidth: (width) - (width/5)
+    property real opHeight: height/2 - height/6
     property string pIcon: IconType.play
     property var songRow: undefined
     property int totalDuration: 0
     property bool isFirstTime: true
     property int currentSongIndex: 0
     property string bgimage: "../assets/navbar-bg.jpeg"
+    property string defaultCoverArt: "../assets/bat-bg3.jpg"
+    property string currentPlayingArtist: ""
+    property string coverArt: defaultCoverArt
+    property bool ifCoverArt: false
     property string remTime: "00:00"
     property string totalTime: "00:00"
     property string currentSongName: ""
-    property bool shuffleOn: false
-    property bool allOff: true
-    property bool repeatAll: false
-    property bool repeatOne: false
     property string selectedSongPath: ""
     property string selectedSongName: ""
     property int selectedSongIndex: -1
-    //property var tempModel: []
+    property string noPlaylistText: "No playlist found, to create one long press on any song "+
+                                     "and select 'Add to playlist'"
     readonly property string licenseKeyString: "AF83995C2734BB4BD8ACD38745DB92A5690BA06E724E5
                                 3A8CA86DEA8D70D7D15C07934C78DEC3DEDA6BECC0A69
                                 E1F459A2E505BCCCC03BFE17D923BC0F475F8D8695A87
@@ -63,16 +66,16 @@ App {
     ListModel { id: tempModel }
     Storage { id: database; clearAllAtStartup: true } // settings storage
     RemoveFile { id: removeId } // delete song by this c++ type
-    MediaExtractor { id: mediaextractorId }
+    MediaExtractor { id: mediaextractorId } // extract album cover art by this c++ type
     SongPlayerPage { id: playingpage } // main playing page
     PlaylistSongPage { id: playlistsongpage} // playlist song container page
-    SearchList
+    TimerMenu
     {
-        id: songsearchMenu
-        x: (parent.width - width)/2
-        y: (parent.height - height)/2
-        onOpened: {console.log("openned")}
-        onClosed:  {console.log("closed")}
+        id: timermenu
+        x: xAxis
+        y: yAxix
+        width: opWidth
+        height: opHeight
     }
 
     onInitTheme:
@@ -132,10 +135,23 @@ App {
     Playlist
     {
         id: mainplaylist
-        playbackMode: Playlist.Loop
+        playbackMode: repeatAllMode
         onCurrentIndexChanged:{
             LOGIC.songChanged(currentItemSource)
-            //mediaextractorId.mediaMetaData(currentItemSource)
+            currentPlayingArtist = mediaextractorId.getArtist(currentItemSource)
+            var cvr = mediaextractorId.getTitle(currentItemSource)
+            var art = mediaextractorId.getAlbumCover(cvr)
+            if(art !== "")
+            {
+
+                coverArt = art
+                ifCoverArt = true
+            }
+            else
+            {
+                coverArt = defaultCoverArt
+                ifCoverArt = false
+            }
         }
         onPlaybackModeChanged: LOGIC.setRepeatShuffle(playbackMode)
     }

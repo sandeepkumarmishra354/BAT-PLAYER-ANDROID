@@ -8,8 +8,6 @@ Page
 {
     id: songPage
     title: "Library"
-    property string noPlaylistText: "No playlist found, to create one long press on any song "+
-                                     "and select 'Add to playlist'"
 
     AppTabBar
     {
@@ -98,13 +96,18 @@ Page
         width: parent.width
         anchors.bottom: parent.bottom
         anchors.top: songItemContainer.bottom
+
         Rectangle
         {
             anchors.top: parent.top
             width: parent.width
             z: 1
             height: 1
-            color: "#E91E63"
+            //color: "#E91E63"
+            gradient: Gradient {
+                GradientStop {position: 0.0; color: "#E91E63"}
+                GradientStop {position: 1.0; color: "red"}
+            }
         }
         Rectangle
         {
@@ -119,14 +122,34 @@ Page
                 id: songText
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.left: parent.left
+                anchors.leftMargin: 5
                 fontSizeMode: Text.Fit
                 text: currentSongName
                 color: "white"
+                onTextChanged:
+                {
+                    if(width > parent.width)
+                        console.log("large")
+                    else
+                        console.log("small")
+                }
             }
             MouseArea
             {
+                property real yCord: 0.0
+                property real distance: 0.0
                 anchors.fill: parent
                 onClicked: navigationStack.push(playingpage)
+                onPressed: yCord = mouseY
+                onPositionChanged:
+                {
+                    distance = yCord - mouseY
+                }
+                onReleased:
+                {
+                    if(distance > 0 && distance >= height/2)
+                        navigationStack.push(playingpage)
+                }
             }
         }
 
@@ -151,7 +174,16 @@ Page
                     icon: pIcon
                     color: "white"
                     anchors.fill: parent
-                    onClicked: LOGIC.playOrPause()
+                    onClicked: {LOGIC.playOrPause(); btnanime.start()}
+                    NumberAnimation
+                    {
+                        id: btnanime
+                        target: playpausebtn
+                        property: "scale"
+                        from: 0.0
+                        to: 1.0
+                        duration: 500
+                    }
                 }
             }
         }

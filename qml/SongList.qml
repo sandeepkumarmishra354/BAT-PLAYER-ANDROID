@@ -10,9 +10,9 @@ AppListView
     signal songPath(string path)
     readonly property string linuxPath: "/root/Music"
     readonly property string nomusicText: "<b>Place your music files to internal storage's Music folder</b>"
-    property variant androidPath: ["file:///sdcard/Music","file:///sdcard","file:///sdcard/Downloads",
+    property variant androidPath: ["file:///sdcard/Music","file:///sdcard","file:///sdcard/Download",
                                    "file:///sdcard/UcDownloads","file:///storage/sdcard1",
-                                   "file:///storage/sdcard1/Music","file:///storage/sdcard1/Downloads",
+                                   "file:///storage/sdcard1/Music","file:///storage/sdcard1/Download",
                                    "file:///storage/sdcard1/UcDownloads","file:///storage/sdcard1/shareit/audio",
                                    "file:///sdcard/shareit/audio"]
     property real xAxis: (width - optionMenu.width)/2
@@ -51,9 +51,11 @@ AppListView
                         {
                             var url = fileURL.toString()
                             var artist = mediaextractorId.getArtist(fileURL)
-                            var itm = {"fileName":fileName,"fileURL":url,"artist":artist}
+                            var songTitle = mediaextractorId.getTitle(fileURL)
+                            var itm = {"fileName":songTitle,"fileURL":url,"artist":artist}
                             allSongModel.append( itm )
                             tempModel.append(itm)
+                            mediaextractorId.extractAlbumCover(fileURL)
                         }
                     }
                 }
@@ -71,15 +73,18 @@ AppListView
                   fullpath: fileURL
                   iconSource: IconType.music
                   style.backgroundColor: "#212121"
-                  style.dividerColor: "#66000000"
+                  style.dividerColor: "#E6000000"
                   style.textColor: "white"
-                  style.detailTextColor: "white"//"#E91E63"
-                  style.fontSizeText:
+                  style.detailTextColor: "#b2b2b2"//"white"//"#E91E63"
+                  style.fontSizeDetailText:
                   {
-                      if(tablet)
-                        return tabletSize
-                      else
-                        return mobileSize
+                      if(Qt.platform.os !== "android")
+                      {
+                        if(tablet)
+                            return sp(20)
+                        else
+                            return sp(15)
+                      }
                   }
 
                   height: dp(70)
@@ -92,7 +97,6 @@ AppListView
                   {
                       id: pressarea
                       anchors.fill: parent
-                      backgroundColor: "#E5000000"
                       centerAnimation: true
                       pressedDuration: 800
                       circularBackground: false
