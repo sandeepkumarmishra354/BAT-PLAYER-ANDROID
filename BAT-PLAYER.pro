@@ -52,10 +52,15 @@ DISTFILES += \
     qml/AppLogic.js \
     qml/SongOptions.qml \
     qml/SettingPage.qml \
-    qml/ThreeDotMenu.qml \
     qml/PlaylistOption.qml \
     qml/PlaylistSongPage.qml \
-    qml/SearchList.qml
+    qml/SearchList.qml \
+    qml/SideBar.qml \
+    qml/TimerMenu.qml \
+    qml/HourTumbler.qml \
+    qml/MinuteTumbler.qml \
+    qml/PropertyContainer.qml \
+    qml/ThemeLogic.js
 
 RESOURCES +=
 
