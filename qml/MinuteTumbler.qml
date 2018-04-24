@@ -20,7 +20,7 @@ Item
         anchors.fill: parent
         model: 61
         wheelEnabled: true
-        wrap: true
+        clip: false
         delegate: AppText
         {
             text: index
@@ -34,7 +34,7 @@ Item
                 y: control.height * 0.4
                 width: 40
                 height: 1
-                color: "#E91E63"
+                color: propertycontainer.lightPink
             }
 
             Rectangle {
@@ -42,9 +42,7 @@ Item
                 y: control.height * 0.6
                 width: 40
                 height: 1
-                color: "#E91E63"
+                color: propertycontainer.lightPink
             }
-
-            onCurrentIndexChanged: console.log("minute "+currentIndex)
     }
 }

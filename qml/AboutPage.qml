@@ -5,10 +5,16 @@ Page
 {
     id: root
     title: "About"
-    backgroundColor: "#212121"
+    //backgroundColor: propertycontainer.darkColor
     readonly property string toEmail: "sandeepkumarmishra354@gmail.com"
     readonly property string toSubj: "BAT-PLAYER bug report"
     property string bugMsg: ""
+
+    Rectangle
+    {
+        anchors.fill: parent
+        gradient: propertycontainer.settingBgGradient
+    }
 
     Image
     {
@@ -25,7 +31,7 @@ Page
         width: parent.width
         anchors.top: appIcon.bottom
         anchors.bottom: parent.bottom
-        color: "#212121"
+        color: propertycontainer.fullTransparent
         Column
         {
             id: descriptionColumn
@@ -95,7 +101,8 @@ Page
                     id: gitAddress
                     text: "Source"
                     icon: IconType.github
-                    backgroundColor: "#19194d"
+                    backgroundColor: propertycontainer.darkColor
+                    backgroundColorPressed: propertycontainer.lightPink
                     onClicked: nativeUtils.openUrl("https://github.com/sandeepkumarmishra354/BAT-PLAYER-ANDROID")
                 }
                 AppButton
@@ -103,7 +110,8 @@ Page
                     id: bugbutton
                     text: "Report bug"
                     icon: IconType.bug
-                    backgroundColor: "#ff3333"
+                    backgroundColorPressed: propertycontainer.darkColor
+                    backgroundColor: propertycontainer.lightPink
                     onClicked: {nativeUtils.displayTextInput("Bug Report","Describe bug","","","Report","Cancel")}
                 }
             }

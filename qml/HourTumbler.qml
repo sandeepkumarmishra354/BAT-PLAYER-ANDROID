@@ -19,7 +19,7 @@ Item
         id: control
         anchors.fill: parent
         model: 13
-        wrap: true
+        clip: false
         wheelEnabled: true
         smooth: true
         delegate: AppText
@@ -35,7 +35,7 @@ Item
                 y: control.height * 0.4
                 width: 40
                 height: 1
-                color: "#E91E63"
+                color: propertycontainer.lightPink
             }
 
             Rectangle {
@@ -43,9 +43,7 @@ Item
                 y: control.height * 0.6
                 width: 40
                 height: 1
-                color: "#E91E63"
+                color: propertycontainer.lightPink
             }
-
-            //onCurrentIndexChanged: console.log("hour "+currentIndex)
     }
 }

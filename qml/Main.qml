@@ -11,85 +11,61 @@ import MediaExtractor 1.0 // c++ class
 import "AppLogic.js" as LOGIC
 
 App {
-    // All fixed properties
     id: root
-    readonly property int sequentialMode: Playlist.Sequential
-    readonly property int randomMode: Playlist.Random
-    readonly property int repeatAllMode: Playlist.Loop
-    readonly property int repeatCurrentMode: Playlist.CurrentItemInLoop
-    readonly property string playIcon: IconType.play
-    readonly property string pauseIcon: IconType.pause
-    readonly property string controlColor: "#262673"
-    // All changable properties
-    property real xAxis: (width - timermenu.width)/2
-    property real yAxix: (height - timermenu.height)/2
-    property real opWidth: (width) - (width/5)
-    property real opHeight: height/2 - height/6
-    property string pIcon: IconType.play
-    property var songRow: undefined
-    property int totalDuration: 0
-    property bool isFirstTime: true
-    property int currentSongIndex: 0
-    property string bgimage: "../assets/navbar-bg.jpeg"
-    property string defaultCoverArt: "../assets/bat-bg3.jpg"
-    property string currentPlayingArtist: ""
-    property string coverArt: defaultCoverArt
-    property bool ifCoverArt: false
-    property string remTime: "00:00"
-    property string totalTime: "00:00"
-    property string currentSongName: ""
-    property string selectedSongPath: ""
-    property string selectedSongName: ""
-    property int selectedSongIndex: -1
-    property string noPlaylistText: "No playlist found, to create one long press on any song "+
-                                     "and select 'Add to playlist'"
-    readonly property string licenseKeyString: "AF83995C2734BB4BD8ACD38745DB92A5690BA06E724E5
-                                3A8CA86DEA8D70D7D15C07934C78DEC3DEDA6BECC0A69
-                                E1F459A2E505BCCCC03BFE17D923BC0F475F8D8695A87
-                                66C234491D8D66B8078E9D1F3E25F8B3ADE396DB04CC0
-                                1C9A6C20CCD729E6090CC7BAEB658D4AFD4A4970EE250
-                                B3682FD1D147FC44F49E763F9C876D5DF163CF3FE0FCF
-                                702985631000F791BA83E89803991D52F7F07BCB51DD1
-                                A22C12054DA9C8A951276C592BAB5E07F7BD81280E4F3
-                                9F3E4227A728FCDCAFAAF489B0A39F0A74FE0BA5842E2
-                                480A1832E410063114C0A4761ADA79CEFAB506B3D5F77
-                                09B7E0473DB408D7E654D537392E8724F7CCC1CA458C3
-                                744CDAF97ADD653672CB9165AEAD8A9EE6B8E6D23AA0F
-                                FDAB3A6D6E5ECB64BCBCD64CC434734B00A015546B4C6
-                                13246ECA3BE90B893F8815D"
+    licenseKey: propertycontainer.licenseKeyString
 
-    licenseKey: licenseKeyString
+    // model of main song list
+    ListModel { id: allSongModel }
 
-    ListModel { id: allSongModel } // model of main song list
-    ListModel { id: playlistModel } // model of playlist names
-    ListModel { id: playlistSongModel } // model of playlist songs
+    // model of playlist names
+    ListModel { id: playlistModel }
+
+    // model of playlist songs
+    ListModel { id: playlistSongModel }
+
+    // temp model for backup
     ListModel { id: tempModel }
-    Storage { id: database; clearAllAtStartup: true } // settings storage
-    RemoveFile { id: removeId } // delete song by this c++ type
-    MediaExtractor { id: mediaextractorId } // extract album cover art by this c++ type
-    SongPlayerPage { id: playingpage } // main playing page
-    PlaylistSongPage { id: playlistsongpage} // playlist song container page
+
+    // contains all variables
+    PropertyContainer { id: propertycontainer; anchors.fill: parent }
+
+    // database
+    Storage { id: database; clearAllAtStartup: true }
+
+    // delete song by this (implemented in C++)
+    RemoveFile { id: removeId }
+
+    // extract album cover art by this (implemented in C++ using taglib)
+    MediaExtractor { id: mediaextractorId }
+
+    // main playing page
+    SongPlayerPage { id: playingpage }
+
+    // playlist song container page
+    PlaylistSongPage { id: playlistsongpage}
+
+    // timer popup menu (sleep timer)
     TimerMenu
     {
         id: timermenu
-        x: xAxis
-        y: yAxix
-        width: opWidth
-        height: opHeight
+        x: propertycontainer.xAxis
+        y: propertycontainer.yAxix
+        width: propertycontainer.opWidth
+        height: propertycontainer.opHeight
     }
 
     onInitTheme:
     {
-        Theme.navigationBar.backgroundColor = "#212121"
-        Theme.tabBar.backgroundColor = "#212121"
-        Theme.tabBar.titleOffColor = "#9E9E9E"
-        Theme.colors.textColor = "white"
-        Theme.navigationAppDrawer.textColor = "#E1BEE7"
-        Theme.navigationAppDrawer.activeTextColor = "#E91E63"
-        Theme.navigationAppDrawer.backgroundColor = "#212121"
-        Theme.navigationAppDrawer.itemBackgroundColor = "#212121"
-        Theme.navigationAppDrawer.dividerColor = "#212121"
-        Theme.colors.scrollbarColor = "#EEEEEE"
+        Theme.navigationBar.backgroundColor = propertycontainer.darkColor
+        Theme.tabBar.backgroundColor = propertycontainer.darkColor
+        Theme.tabBar.titleOffColor = propertycontainer.lightGrey
+        Theme.colors.textColor = propertycontainer.textColor
+        Theme.navigationAppDrawer.textColor = propertycontainer.drowerTextColor
+        Theme.navigationAppDrawer.activeTextColor = propertycontainer.textColor
+        Theme.navigationAppDrawer.backgroundColor = propertycontainer.darkColor
+        Theme.navigationAppDrawer.itemBackgroundColor = propertycontainer.darkColor
+        Theme.navigationAppDrawer.dividerColor = propertycontainer.darkColor
+        Theme.colors.scrollbarColor = propertycontainer.scrollBarColor
     }
 
     Navigation
@@ -135,22 +111,23 @@ App {
     Playlist
     {
         id: mainplaylist
-        playbackMode: repeatAllMode
+        playbackMode: propertycontainer.repeatAllMode
         onCurrentIndexChanged:{
+            console.log(currentItemSource)
             LOGIC.songChanged(currentItemSource)
-            currentPlayingArtist = mediaextractorId.getArtist(currentItemSource)
+            propertycontainer.currentPlayingArtist = mediaextractorId.getArtist(currentItemSource)
             var cvr = mediaextractorId.getTitle(currentItemSource)
             var art = mediaextractorId.getAlbumCover(cvr)
             if(art !== "")
             {
 
-                coverArt = art
-                ifCoverArt = true
+                propertycontainer.coverArt = art
+                propertycontainer.ifCoverArt = true
             }
             else
             {
-                coverArt = defaultCoverArt
-                ifCoverArt = false
+                propertycontainer.coverArt = propertycontainer.defaultCoverArt
+                propertycontainer.ifCoverArt = false
             }
         }
         onPlaybackModeChanged: LOGIC.setRepeatShuffle(playbackMode)

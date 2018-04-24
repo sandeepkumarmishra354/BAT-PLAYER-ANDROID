@@ -19,7 +19,7 @@ Menu
         id: bgRect
         radius: 30
         border.width: 1
-        border.color: "#E91E63"
+        border.color: propertycontainer.lightPink
         color: Qt.rgba(0,0,0, 0.75)
         Rectangle
         {
@@ -47,11 +47,7 @@ Menu
                 anchors.right: mintumblerRect.left
                 anchors.bottom: hrtumblerRect.bottom
                 height: 0
-                gradient: Gradient
-                {
-                    GradientStop {position: 0.0; color: "#E91E63"}
-                    GradientStop {position: 1.0; color: "red"}
-                }
+                gradient: propertycontainer.sidebarGradient
 
                 NumberAnimation
                 {
@@ -99,7 +95,7 @@ Menu
             {
                 id: hrminText
                 anchors.horizontalCenter: parent.horizontalCenter
-                color: "#E91E63"
+                color: propertycontainer.lightPink
                 text:
                 {
                     var hr = hrtumbler.getCurrentIndex()
@@ -116,6 +112,7 @@ Menu
                 {
                     id: onoffbtn
                     icon: IconType.play
+                    color: propertycontainer.lightPink
                     Behavior on opacity
                     {
                         NumberAnimation { duration: 500 }
@@ -138,6 +135,7 @@ Menu
                 {
                     id: restart
                     icon: IconType.repeat
+                    color: propertycontainer.lightPink
                     onClicked:
                     {
                         quittimer.restart()

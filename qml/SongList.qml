@@ -12,7 +12,9 @@ AppListView
     readonly property string nomusicText: "<b>Place your music files to internal storage's Music folder</b>"
     property variant androidPath: ["file:///sdcard/Music","file:///sdcard","file:///sdcard/Download",
                                    "file:///sdcard/UcDownloads","file:///storage/sdcard1",
+                                   "file:///sdcard/Downloads",
                                    "file:///storage/sdcard1/Music","file:///storage/sdcard1/Download",
+                                   "file:///storage/sdcard1/Downloads",
                                    "file:///storage/sdcard1/UcDownloads","file:///storage/sdcard1/shareit/audio",
                                    "file:///sdcard/shareit/audio"]
     property real xAxis: (width - optionMenu.width)/2
@@ -72,10 +74,9 @@ AppListView
                   detailText: artist
                   fullpath: fileURL
                   iconSource: IconType.music
-                  style.backgroundColor: "#212121"
-                  style.dividerColor: "#E6000000"
-                  style.textColor: "white"
-                  style.detailTextColor: "#b2b2b2"//"white"//"#E91E63"
+                  style.backgroundColor: Qt.rgba(0,0,0, 0.45)
+                  style.dividerColor: propertycontainer.listDividerColor
+                  style.detailTextColor: propertycontainer.detailTextColor
                   style.fontSizeDetailText:
                   {
                       if(Qt.platform.os !== "android")
@@ -86,7 +87,7 @@ AppListView
                             return sp(15)
                       }
                   }
-
+                  //visible: ( index == 3 ? true : false )
                   height: dp(70)
                   Component.onCompleted:
                   {
@@ -103,9 +104,9 @@ AppListView
                       onPressAndHold:
                       {
                           console.log("press and hold")
-                          selectedSongIndex = index
-                          selectedSongPath = fullpath
-                          selectedSongName = text
+                          propertycontainer.selectedSongIndex = index
+                          propertycontainer.selectedSongPath = fullpath
+                          propertycontainer.selectedSongName = text
                           optionMenu.open()
                       }
 
@@ -117,7 +118,7 @@ AppListView
                   }
               }
 
-    opacity: 0.7
+    //opacity: 0.7
     emptyText.text: nomusicText
     emptyText.color: "purple"
 

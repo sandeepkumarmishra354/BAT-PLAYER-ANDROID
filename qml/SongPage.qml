@@ -2,6 +2,7 @@ import QtQuick 2.0
 import QtQuick.Controls 2.2 as QQCONTROL
 import VPlayApps 1.0
 import QtMultimedia 5.8
+import QtGraphicalEffects 1.0
 import "AppLogic.js" as LOGIC
 
 Page
@@ -37,12 +38,30 @@ Page
         Rectangle
         {
             id: songsTab
-            Image
+            AppImage
             {
                 id: mainbg
                 anchors.fill: parent
-                source: "../assets/main-bg.jpg"
+                visible: propertycontainer.ifMainImageOn
+                source: propertycontainer.mainBgImage
+                Behavior on source {
+                    NumberAnimation
+                    {
+                        target: mainbg
+                        property: "opacity"
+                        from: 0.0
+                        to: 1.0
+                        duration: 1000
+                    }
+                }
             }
+            Rectangle
+            {
+                anchors.fill: parent
+                visible: !propertycontainer.ifMainImageOn
+                gradient: propertycontainer.settingBgGradient
+            }
+
             SearchBar
             {
                 id: searchbar
@@ -50,7 +69,7 @@ Page
                 target: songlistview
                 inputBackgroundColor: "#E6000000"
                 barBackgroundColor: "#66000000"
-                iconColor: "#E91E63"
+                iconColor: propertycontainer.lightPink
                 placeHolderText: "Search song"
                 opacity: 0.0
                 Behavior on opacity
@@ -72,6 +91,22 @@ Page
         Rectangle
         {
             id: playlistTab
+            AppImage
+            {
+                id: playlistbg
+                anchors.fill: parent
+                source: propertycontainer.mainBgImage
+                Behavior on source {
+                    NumberAnimation
+                    {
+                        target: playlistbg
+                        property: "opacity"
+                        from: 0.0
+                        to: 1.0
+                        duration: 1000
+                    }
+                }
+            }
             AppListView
             {
                 id: playlistView
@@ -80,13 +115,13 @@ Page
                 delegate: SimpleRow
                 {
                     text: plOption
-                    style.backgroundColor: "#212121"
-                    style.dividerColor: "#66000000"
-                    style.textColor: "white"
+                    style.backgroundColor: Qt.rgba(0,0,0, 0.45)
+                    style.dividerColor: propertycontainer.listDividerColor
+                    style.detailTextColor: propertycontainer.detailTextColor
                     onSelected: LOGIC.openPlaylist(text)
                 }
-                emptyText.text: noPlaylistText
-                backgroundColor: "#212121"
+                emptyText.text: propertycontainer.noPlaylistText
+                emptyText.color: "purple"
             }
         }
     }
@@ -96,16 +131,19 @@ Page
         width: parent.width
         anchors.bottom: parent.bottom
         anchors.top: songItemContainer.bottom
+        onWidthChanged: propertycontainer.pageTotalWidth = width
 
         Rectangle
         {
+            id: pageP
             anchors.top: parent.top
-            width: parent.width
+            width: propertycontainer.pageProgressWidth
+            smooth: true
+            antialiasing: true
             z: 1
             height: 1
-            //color: "#E91E63"
             gradient: Gradient {
-                GradientStop {position: 0.0; color: "#E91E63"}
+                GradientStop {position: 0.0; color: propertycontainer.lightPink}
                 GradientStop {position: 1.0; color: "red"}
             }
         }
@@ -115,7 +153,7 @@ Page
             width: (parent.width / 2) + (parent.width / 3)
             height: parent.height
             anchors.left: parent.left
-            color: "#212121"
+            color: propertycontainer.darkColor
 
             AppText
             {
@@ -124,8 +162,7 @@ Page
                 anchors.left: parent.left
                 anchors.leftMargin: 5
                 fontSizeMode: Text.Fit
-                text: currentSongName
-                color: "white"
+                text: propertycontainer.currentSongName
                 onTextChanged:
                 {
                     if(width > parent.width)
@@ -159,30 +196,38 @@ Page
             height: parent.height
             anchors.left: songNameHolder.right
             anchors.right: parent.right
-            color: "#212121"
+            color: propertycontainer.darkColor
             Rectangle
             {
                 anchors.centerIn: parent
                 width: playpausebtn.width
                 height: playpausebtn.height
-                border.color: "#E91E63"
-                color: "#212121"
+                color: propertycontainer.textColor
                 radius: 50
                 IconButton
                 {
                     id: playpausebtn
-                    icon: pIcon
-                    color: "white"
+                    icon: propertycontainer.pIcon
+                    color: "black"
                     anchors.fill: parent
-                    onClicked: {LOGIC.playOrPause(); btnanime.start()}
+                    onClicked: {LOGIC.playOrPause(); btnanime1.start(); btnanime2.start()}
                     NumberAnimation
                     {
-                        id: btnanime
+                        id: btnanime1
                         target: playpausebtn
                         property: "scale"
                         from: 0.0
                         to: 1.0
-                        duration: 500
+                        duration: 200
+                    }
+                    NumberAnimation
+                    {
+                        id: btnanime2
+                        target: playpausebtn
+                        property: "rotation"
+                        from: 0
+                        to: 360
+                        duration: 200
                     }
                 }
             }

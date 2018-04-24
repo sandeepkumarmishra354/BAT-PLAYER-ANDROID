@@ -13,7 +13,7 @@ Menu
 
     background: Rectangle
     {
-        color: "#212121"
+        color: propertycontainer.darkColor
         AppListView
         {
             id: songsearchlist

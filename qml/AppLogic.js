@@ -1,7 +1,7 @@
 function playThis(index, row)
 {
     setPlayingIcon()
-    songRow = row
+    propertycontainer.songRow = row
     mainplaylist.currentIndex = index
     batplayer.play()
     console.log("pt= "+index)
@@ -9,9 +9,9 @@ function playThis(index, row)
 
 function setPlayingIcon()
 {
-    if(songRow !== undefined)
+    if(propertycontainer.songRow !== undefined)
     {
-        songRow.iconSource = IconType.music
+        propertycontainer.songRow.iconSource = IconType.music
     }
 }
 
@@ -49,9 +49,10 @@ function calculateRemTime(position)
     if(sec < 10)
         sec = "0"+sec
     var time = min + ":" + sec
-    remTime = time
+    propertycontainer.remTime = time
     // set slider position
     updateSongSlider(position)
+    propertycontainer.pageProgressWidth = propertycontainer.tmpProgressWidth*totalDurSec
 }
 
 function calculateTotalTime(duration)
@@ -64,27 +65,29 @@ function calculateTotalTime(duration)
     if(sec < 10)
         sec = "0"+sec
     var time = min + ":" + sec
-    totalTime = time
-    totalDuration = totalDurSec
+    propertycontainer.totalTime = time
+    propertycontainer.totalDuration = totalDurSec
+    propertycontainer.pageProgressWidth = 0.0
+    propertycontainer.tmpProgressWidth = propertycontainer.pageTotalWidth/totalDurSec
 }
 
 function updateSongSlider(pos)
 {
     pos = pos/1000
-    playingpage.sliderValue = pos/totalDuration
+    playingpage.sliderValue = pos/propertycontainer.totalDuration
 }
 
 function setSongPosition(pos)
 {
-    var offset = totalDuration*1000*pos
+    var offset = propertycontainer.totalDuration*1000*pos
     batplayer.seek(offset)
 }
 
 function songChanged(src)
 {
     var mp3 = mediaextractorId.getTitle(src)
-    currentSongName = mp3
-    currentSongIndex = mainplaylist.currentIndex
+    propertycontainer.currentSongName = mp3
+    propertycontainer.currentSongIndex = mainplaylist.currentIndex
 }
 
 function setRepeatShuffle(mode)
@@ -94,12 +97,12 @@ function setRepeatShuffle(mode)
         console.log("shuffle mode")
         if(shuffleOn)
         {
-            mainplaylist.playbackMode = sequentialMode
+            mainplaylist.playbackMode = propertycontainer.sequentialMode
             console.log("shuffle off")
         }
         else
         {
-            mainplaylist.playbackMode = randomMode
+            mainplaylist.playbackMode = propertycontainer.randomMode
             console.log("shuffle on")
         }
     }
@@ -108,20 +111,20 @@ function setRepeatShuffle(mode)
         console.log("repeat mode")
         switch (mainplaylist.playbackMode)
         {
-            case sequentialMode:
-                mainplaylist.playbackMode = repeatCurrentMode
+            case propertycontainer.sequentialMode:
+                mainplaylist.playbackMode = propertycontainer.repeatCurrentMode
                 console.log("repeat curr")
                 break
-            case repeatCurrentMode:
-                mainplaylist.playbackMode = repeatAllMode
+            case propertycontainer.repeatCurrentMode:
+                mainplaylist.playbackMode = propertycontainer.repeatAllMode
                 console.log("repeat all")
                 break
-            case repeatAllMode:
-                mainplaylist.playbackMode = sequentialMode
+            case propertycontainer.repeatAllMode:
+                mainplaylist.playbackMode = propertycontainer.sequentialMode
                 console.log("sequential")
                 break
             default:
-                mainplaylist.playbackMode = repeatCurrentMode
+                mainplaylist.playbackMode = propertycontainer.repeatCurrentMode
                 console.log("sequential default")
                 break
         }
@@ -131,9 +134,9 @@ function setRepeatShuffle(mode)
 function setPlayPauseIcon(flag)
 {
     if(flag) // playing
-        pIcon = pauseIcon
+        propertycontainer.pIcon = propertycontainer.pauseIcon
     else // paused
-        pIcon = playIcon
+        propertycontainer.pIcon = propertycontainer.playIcon
 }
 
 function check()
@@ -145,14 +148,14 @@ function check()
     }
     else
     {
-        isFirstTime = false
+        propertycontainer.isFirstTime = false
         restorePrevious()
     }
 }
 
 function restorePrevious()
 {
-    if( ! isFirstTime )
+    if( ! propertycontainer.isFirstTime )
     {
         mainplaylist.currentIndex = database.getValue("index")
         mainplaylist.playbackMode = database.getValue("playbackMode")
@@ -167,7 +170,7 @@ function restorePrevious()
 
 function saveData()
 {
-    database.setValue("index", currentSongIndex)
+    database.setValue("index", propertycontainer.currentSongIndex)
     database.setValue("position", batplayer.position)
     database.setValue("playbackMode", mainplaylist.playbackMode)
 }
@@ -176,18 +179,18 @@ function searchSong(text)
 {
     if(text !== "")
     {
-        var textS = new RegExp(text,"i")
+        text = new RegExp(text,"i")
         for(var i=0; i<allSongModel.count; ++i)
         {
             var itm = allSongModel.get(i)
-            if(itm.fileName.search(textS) !== -1)
+            if(itm.fileName.search(text) !== -1)
             {
                 allSongModel.clear()
                 mainplaylist.clear()
                 for(var j=0; tempModel.count; ++j)
                 {
                     var titm = tempModel.get(j)
-                    if(titm.fileName.search(textS) !== -1)
+                    if(titm.fileName.search(text) !== -1)
                     {
                         allSongModel.append(titm)
                     }
@@ -216,7 +219,7 @@ function handleSongOption(index)
     if(index === 0) // play option clicked
     {
         console.log("play option")
-        mainplaylist.currentIndex = selectedSongIndex
+        mainplaylist.currentIndex = propertycontainer.selectedSongIndex
         batplayer.play()
     }
 
@@ -229,16 +232,16 @@ function handleSongOption(index)
     if(index === 2) // Share option clicked
     {
         console.log("Share option")
-        nativeUtils.share("Share song with",selectedSongPath)
+        nativeUtils.share("Share song with",propertycontainer.selectedSongPath)
     }
 
     if(index === 3) // delete option clicked
     {
         console.log("delete option")
-        if(mainplaylist.removeItem(selectedSongIndex) && removeId.deleteFile(selectedSongPath))
+        if(mainplaylist.removeItem(propertycontainer.selectedSongIndex) && removeId.deleteFile(propertycontainer.selectedSongPath))
         {
-            allSongModel.remove(selectedSongIndex)
-            LOGIC.removeFromTempModel(selectedSongIndex)
+            allSongModel.remove(propertycontainer.selectedSongIndex)
+            LOGIC.removeFromTempModel(propertycontainer.selectedSongIndex)
         }
     }
 }
@@ -252,8 +255,8 @@ function createNewPlaylist(enteredText)
         var tmpSongListPath = database.getValue(enteredText+"pl")
         if(tmpSongList === undefined && tmpSongListPath === undefined)
         {
-            var songList = [selectedSongName]
-            var songListPath = [selectedSongPath]
+            var songList = [propertycontainer.selectedSongName]
+            var songListPath = [propertycontainer.selectedSongPath]
             database.setValue(enteredText, songList)
             database.setValue(enteredText+"pl",songListPath)
         }
@@ -279,13 +282,13 @@ function addToThisPlaylist(plName)
 
     if(songList !== undefined)
     {
-        songList.push(selectedSongName)
+        songList.push(propertycontainer.selectedSongName)
         database.clearValue(plName)
         database.setValue(plName,songList)
     }
     if(songListPath !== undefined)
     {
-        songListPath.push(selectedSongPath)
+        songListPath.push(propertycontainer.selectedSongPath)
         database.clearValue(plName+"pl")
         database.setValue(plName+"pl",songListPath)
     }

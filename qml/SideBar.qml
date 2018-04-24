@@ -7,12 +7,12 @@ Rectangle
     id: sidebar
     property int icnHeight: 0
     property int icnWidth: 0
-    property bool shuffleOn: (mainplaylist.playbackMode === randomMode ? true : false)
-    property bool repeatAllOn: (mainplaylist.playbackMode === repeatAllMode ? true : false)
-    property bool repeatOneOn: (mainplaylist.playbackMode === repeatCurrentMode ? true : false)
+    property bool shuffleOn: (mainplaylist.playbackMode === propertycontainer.randomMode ? true : false)
+    property bool repeatAllOn: (mainplaylist.playbackMode === propertycontainer.repeatAllMode ? true : false)
+    property bool repeatOneOn: (mainplaylist.playbackMode === propertycontainer.repeatCurrentMode ? true : false)
     property bool timerOn: false
     property bool repeatOff: {
-                                if(shuffleOn || mainplaylist.playbackMode === sequentialMode)
+                                if(shuffleOn || mainplaylist.playbackMode === propertycontainer.sequentialMode)
                                     return true
                                 else
                                     return false
@@ -20,16 +20,13 @@ Rectangle
     width: 1
     height: icnHeight
     opacity: 0.7
-    gradient: Gradient {
-        GradientStop {position: 0.0; color: "#E91E63"}
-        GradientStop {position: 1.0; color: "red"}
-    }
+    gradient: propertycontainer.sidebarGradient
     Behavior on width
     {
         NumberAnimation
         {
             easing.type: Easing.InOutElastic
-            duration: 600
+            duration: 400
         }
     }
     Row
@@ -46,7 +43,7 @@ Rectangle
         IconButton
         {
             id: repeat
-            icon: IconType.repeat
+            icon: IconType.refresh
             color: ( (repeatAllOn || repeatOneOn) ? "black" : "grey" )
             Component.onCompleted: {icnWidth += width}
             onClicked:
@@ -84,14 +81,14 @@ Rectangle
         height: sidebar.height
         anchors.right: sidebar.left
         radius: 10
-        color: "transparent"//"#212121"
+        color: "transparent"
 
         IconButton
         {
             anchors.fill: parent
             //icon: IconType.arrowsh
             icon: IconType.arrowcircleoleft
-            color: "#E91E63"
+            color: propertycontainer.lightPink
             RotationAnimation on rotation
             {
                 id: rotateBtn

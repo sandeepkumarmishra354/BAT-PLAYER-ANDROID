@@ -13,7 +13,7 @@ Menu
 
     background: Rectangle
     {
-        color: "#212121"
+        color: propertycontainer.darkColor
         AppListView
         {
             id: list
@@ -26,9 +26,9 @@ Menu
             ]
             delegate: SimpleRow
             {
-                style.backgroundColor: "#212121"
-                style.dividerColor: "#66000000"
-                style.textColor: "white"
+                style.backgroundColor: propertycontainer.darkColor
+                style.dividerColor: propertycontainer.listDividerColor
+                visible: (index == 1 ? false : true)
                 onSelected:
                 {
                     if(index == 3)

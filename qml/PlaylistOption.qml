@@ -13,7 +13,7 @@ Menu
 
     background: Rectangle
     {
-        color: "#212121"
+        color: propertycontainer.darkColor
         AppListView
         {
             id: list
@@ -21,7 +21,7 @@ Menu
             emptyText.text: "No playlist found, Tap plus icon to create a new playlist"
             header: Rectangle
             {
-                color: "#212121"
+                color: propertycontainer.darkColor
                 width: parent.width
                 height: mainParent.height/4 - 5
                 Icon
@@ -30,7 +30,7 @@ Menu
                     anchors.left: createText.right
                     anchors.leftMargin: 5
                     icon: IconType.plus
-                    color: "#E91E63"
+                    color: propertycontainer.lightPink
                 }
 
                 AppText
@@ -38,14 +38,14 @@ Menu
                     id: createText
                     text: "Create new"
                     anchors.centerIn: parent
-                    color: "#E91E63"
+                    color: propertycontainer.lightPink
                 }
                 Rectangle
                 {
                     width: parent.width
                     height: 1
                     anchors.bottom: parent.bottom
-                    color: "#E91E63"
+                    color: propertycontainer.lightPink
                 }
                 MouseArea
                 {
@@ -57,9 +57,8 @@ Menu
             delegate: SimpleRow
             {
                 text: plOption
-                style.backgroundColor: "#212121"
-                style.dividerColor: "#66000000"
-                style.textColor: "white"
+                style.backgroundColor: propertycontainer.darkColor
+                style.dividerColor: propertycontainer.listDividerColor
                 onSelected:
                 {
                     mainParent.close()

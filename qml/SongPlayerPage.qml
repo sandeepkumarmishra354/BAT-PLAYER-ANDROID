@@ -2,54 +2,47 @@ import QtQuick 2.0
 import VPlayApps 1.0
 import QtMultimedia 5.8
 import QtQuick.Controls 1.2
-
 import QtGraphicalEffects 1.0
 import "AppLogic.js" as LOGIC
 
 Page
 {
-    id: songplayerpage
     property real sliderValue: 0.0
     property bool startAnimation: false
+    id: songplayerpage
     title: "Now Playing"
-    Rectangle
+    AppImage
     {
-        id: playerimageRect
-        color: "#212121"
+        id: playingbgImage
         anchors.fill: parent
-        Image
+        source: propertycontainer.coverArt
+        Behavior on source
         {
-            id: bgimage
-            anchors.fill: parent
-            source: coverArt
-            smooth: true
-            asynchronous: true
-            visible: false
-            onSourceChanged:
-            {
-                if(coverArt !== defaultCoverArt)
-                    bluranime.start()
-                else
-                    bgimgblur.radius = 0
-            }
-        }
-        FastBlur
-        {
-            id: bgimgblur
-            anchors.fill: bgimage
-            source: bgimage
-            radius: 0
             NumberAnimation
             {
-                id: bluranime
-                target: bgimgblur
-                property: "radius"
-                from: 0
-                to: 64
+                target: playingbgImage
+                property: "opacity"
+                from: 0.0
+                to: 1.0
                 duration: 500
             }
         }
+    }
+    FastBlur
+    {
+        anchors.fill: playingbgImage
+        source: playingbgImage
+        radius: 50
+        z: 1
+    }
 
+    Rectangle
+    {
+        id: playerimageRect
+        gradient: propertycontainer.settingBgGradient
+        anchors.fill: parent
+        z: 2
+        opacity: 0.6
         Rectangle
         {
             id: mainCvrArtRect
@@ -71,9 +64,9 @@ Page
                 onReleased:
                 {
                     if(distance < 0 && distance <= -mainCvrArtRect.width/3)
-                        LOGIC.playNextTrack()
-                    if(distance > 0 && distance >= mainCvrArtRect.width/3)
                         LOGIC.playPrevTrack()
+                    if(distance > 0 && distance >= mainCvrArtRect.width/3)
+                        LOGIC.playNextTrack()
                 }
             }
             AppImage
@@ -82,8 +75,8 @@ Page
                 anchors.fill: parent
                 asynchronous: true
                 smooth: true
-                source: coverArt
-                visible: ifCoverArt
+                source: propertycontainer.coverArt
+                visible: propertycontainer.ifCoverArt
                 Behavior on source
                 {
                     NumberAnimation
@@ -92,13 +85,13 @@ Page
                         property: "scale"
                         from: 0.0
                         to: 1.0
-                        duration: 500
+                        duration: 200
                         onRunningChanged:
                         {
                             if(running)
                                 console.log("running")
                             else
-                                textanime.start()//console.log("not running")
+                                textanime.start()
                         }
                     }
                 }
@@ -106,13 +99,12 @@ Page
         }
         Rectangle
         {
-            property string temptext: currentPlayingArtist
+            property string temptext: propertycontainer.currentPlayingArtist
             id: songtextRect
-            width: parent.width/2+10
+            width: parent.width
             anchors.top: parent.top
             anchors.bottom: mainCvrArtRect.top
             opacity: 0.0
-            border.color: "white"
             color: "transparent"
             NumberAnimation
             {
@@ -121,7 +113,7 @@ Page
                 property: "opacity"
                 from: 0.0
                 to: 1.0
-                duration: 800
+                duration: 300
             }
 
             AppText
@@ -132,7 +124,7 @@ Page
                 anchors.top: parent.top
                 anchors.topMargin: 5
                 anchors.horizontalCenter: parent.horizontalCenter
-                text: currentSongName
+                text: propertycontainer.currentSongName
             }
             AppText
             {
@@ -142,7 +134,7 @@ Page
                 anchors.leftMargin: 5
                 font.pixelSize: songnameText.font.pixelSize/1.4
                 anchors.horizontalCenter: parent.horizontalCenter
-                text: currentPlayingArtist
+                text: propertycontainer.currentPlayingArtist
             }
             onTemptextChanged: opacity = 0.0
         }
@@ -158,25 +150,22 @@ Page
     Rectangle
     {
         id: playercontrolar
+        z: 3
         width: parent.width
         height: parent.height/5+10
         anchors.bottom: parent.bottom
-        //opacity: 0.8
-        color: "transparent"
-        //layer.enabled: true
-
+        color: propertycontainer.fullTransparent
         Rectangle
         {
             id: playerprogress
             width: parent.width
             height: parent.height/5 + 10
-            color: Qt.rgba(0,0,0, 0.75)
+            color: propertycontainer.fullTransparent
 
             AppText
             {
                 id: remtime
-                text: remTime
-                color: "white"
+                text: propertycontainer.remTime
                 anchors.leftMargin: 5
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.left: parent.left
@@ -205,8 +194,7 @@ Page
             AppText
             {
                 id: totaltime
-                text: totalTime
-                color: "white"
+                text: propertycontainer.totalTime
                 anchors.rightMargin: 5
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.right: parent.right
@@ -219,8 +207,8 @@ Page
                 anchors.centerIn: parent
                 value: sliderValue
                 smooth: true
-                knobColor: "#E91E63"
-                tintedTrackColor: "#E91E63"
+                knobColor: propertycontainer.lightPink
+                tintedTrackColor: propertycontainer.lightPink
                 trackColor: Qt.rgba(0,0,0, 0.75)
                 onMoved: LOGIC.setSongPosition(position)
             }
@@ -231,7 +219,7 @@ Page
             width: parent.width
             anchors.top: playerprogress.bottom
             anchors.bottom: parent.bottom
-            color: Qt.rgba(0,0,0, 0.75)//"#212121"
+            color: propertycontainer.fullTransparent
             Row
             {
                 id: controlRow
@@ -239,11 +227,10 @@ Page
                 spacing: dp(30)
                 Rectangle
                 {
-                    width: prevbtn.width-5
-                    height: prevbtn.height-5
-                    border.color: "#E91E63"
+                    width: prevbtn.width
+                    height: prevbtn.height
                     radius: 50
-                    color: Qt.rgba(0,0,0, 0.75)//"#212121"
+                    color: Qt.rgba(0,0,0, 0.75)
                     IconButton
                     {
                         id: prevbtn
@@ -255,35 +242,58 @@ Page
                 }
                 Rectangle
                 {
+                    id: plbtnRect
                     width: playpausebtn.width + 15
                     height: playpausebtn.height + 15
-                    border.color: "#E91E63"
-                    color: Qt.rgba(0.21,0,0, 0.75)//"#212121"
+                    color: "white"
                     radius: 50
                     IconButton
                     {
                         id: playpausebtn
                         anchors.centerIn: parent
-                        icon: pIcon
-                        color: "white"
-                        onClicked: {LOGIC.playOrPause(); btnanime.start()}
+                        icon: propertycontainer.pIcon
+                        color: "black"
+                        onClicked:
+                        {
+                            LOGIC.playOrPause()
+                            btnanime1.start()
+                            btnanime2.start()
+                            btnanime3.start()
+                        }
                         NumberAnimation
                         {
-                            id: btnanime
+                            id: btnanime1
                             target: playpausebtn
                             property: "scale"
                             from: 0.0
                             to: 1.0
-                            duration: 200
+                            duration: 700
+                        }
+                        NumberAnimation
+                        {
+                            id: btnanime2
+                            target: playpausebtn
+                            property: "rotation"
+                            from: 0
+                            to: 360
+                            duration: 700
+                        }
+                        NumberAnimation
+                        {
+                            id: btnanime3
+                            target: plbtnRect
+                            property: "width"
+                            from: plbtnRect.width+10
+                            to: plbtnRect.width
+                            duration: 700
                         }
                     }
                 }
                 Rectangle
                 {
-                    width: nextbtn.width-5
-                    height: nextbtn.height-5
-                    border.color: "#E91E63"
-                    color: Qt.rgba(0,0,0, 0.75)//"#212121"
+                    width: nextbtn.width
+                    height: nextbtn.height
+                    color: Qt.rgba(0,0,0, 0.75)
                     radius: 50
                     IconButton
                     {
