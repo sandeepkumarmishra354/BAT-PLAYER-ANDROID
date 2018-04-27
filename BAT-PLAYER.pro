@@ -22,7 +22,9 @@ DEPLOYMENTFOLDERS += assetsFolder
 # The .cpp file which was generated for your project. Feel free to hack it.
 SOURCES += main.cpp \
     removefile.cpp \
-    mediaextractor.cpp
+    mediaextractor.cpp \
+    filereader.cpp \
+    readthread.cpp
 
 android {
     ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
@@ -66,7 +68,9 @@ RESOURCES +=
 
 HEADERS += \
     removefile.h \
-    mediaextractor.h
+    mediaextractor.h \
+    filereader.h \
+    readthread.h
 
 contains(ANDROID_TARGET_ARCH,armeabi-v7a) {
     ANDROID_EXTRA_LIBS = \

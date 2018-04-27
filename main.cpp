@@ -3,12 +3,16 @@
 #include <QQmlApplicationEngine>
 #include "removefile.h"
 #include "mediaextractor.h"
+#include "filereader.h"
+#include "readthread.h"
 
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
     qmlRegisterType<MediaExtractor>("MediaExtractor", 1, 0, "MediaExtractor");
     qmlRegisterType<RemoveFile>("RemoveFile", 1, 0, "RemoveFile");
+    qmlRegisterType<FileReader>("FileReader", 1, 0, "FileReader");
+    qmlRegisterType<ReadThread>("ReadThread", 1, 0, "ReadThread");
     VPApplication vplay;
 
     // Use platform-specific fonts instead of V-Play's default font

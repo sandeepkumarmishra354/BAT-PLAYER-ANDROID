@@ -93,7 +93,7 @@ void MediaExtractor::extractAlbumCover(QString mediaPath)
         title.prepend(svPath+"/");
         foreach(QFileInfo itm, cvrArtListInfo)
         {
-            if(itm.absoluteFilePath() == title)
+            if(itm.filePath() == title)
             {
                 already = true;
                 break;
@@ -131,13 +131,14 @@ void MediaExtractor::extractAlbumCover(QString mediaPath)
                             fwrite(SrcImage,Size,1, jpegFile);
                             fclose(jpegFile);
                             free( SrcImage );
-                            //mediaCoverArtPathList.append(title);
                         }
                     }
                 }
             }
 
         }
+
+        already = false;
     }
 
     initCvrArtList();
@@ -160,6 +161,7 @@ QString MediaExtractor::getAlbumCover(QString mediaTitle)
         if(itm.fileName().contains(mediaTitle))
         {
             cvrPath = mediaTitle.prepend(path);
+            qDebug()<<"find";
             break;
         }
     }
