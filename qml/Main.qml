@@ -8,7 +8,10 @@ import QtQml 2.2
 import QtSensors 5.9
 import RemoveFile 1.0 // c++ class
 import MediaExtractor 1.0 // c++ class
+import FileReader 1.0 // c++ class
+import ReadThread 1.0 // c++ class
 import "AppLogic.js" as LOGIC
+import "ThemeLogic.js" as THEMELOGIC
 
 App {
     id: root
@@ -38,6 +41,26 @@ App {
     // extract album cover art by this (implemented in C++ using taglib)
     MediaExtractor { id: mediaextractorId }
 
+    // start file reading from whole disk in a new thread (implemented in C++)
+    ReadThread
+    {
+        id: readthreadId
+        onAddToModel:
+        {
+            var url = Qt.resolvedUrl(path)
+            var artist = mediaextractorId.getArtist(url)
+            var songTitle = mediaextractorId.getTitle(url)
+            var itm = {"fileName":songTitle,"fileURL":url,"artist":artist}
+            allSongModel.append( itm )
+            tempModel.append(itm)
+            mediaextractorId.extractAlbumCover(url)
+        }
+        onReadFinished:
+        {
+            propertycontainer.isLoading = false
+        }
+    }
+
     // main playing page
     SongPlayerPage { id: playingpage }
 
@@ -56,16 +79,7 @@ App {
 
     onInitTheme:
     {
-        Theme.navigationBar.backgroundColor = propertycontainer.darkColor
-        Theme.tabBar.backgroundColor = propertycontainer.darkColor
-        Theme.tabBar.titleOffColor = propertycontainer.lightGrey
-        Theme.colors.textColor = propertycontainer.textColor
-        Theme.navigationAppDrawer.textColor = propertycontainer.drowerTextColor
-        Theme.navigationAppDrawer.activeTextColor = propertycontainer.textColor
-        Theme.navigationAppDrawer.backgroundColor = propertycontainer.darkColor
-        Theme.navigationAppDrawer.itemBackgroundColor = propertycontainer.darkColor
-        Theme.navigationAppDrawer.dividerColor = propertycontainer.darkColor
-        Theme.colors.scrollbarColor = propertycontainer.scrollBarColor
+        THEMELOGIC.initTheme()
     }
 
     Navigation

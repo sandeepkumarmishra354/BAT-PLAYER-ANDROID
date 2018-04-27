@@ -63,9 +63,9 @@ Page
                 onPositionChanged: { distance = xCord - mouseX }
                 onReleased:
                 {
-                    if(distance < 0 && distance <= -mainCvrArtRect.width/3)
+                    if(distance < 0 && distance <= -mainCvrArtRect.width/3-10)
                         LOGIC.playPrevTrack()
-                    if(distance > 0 && distance >= mainCvrArtRect.width/3)
+                    if(distance > 0 && distance >= mainCvrArtRect.width/3-10)
                         LOGIC.playNextTrack()
                 }
             }

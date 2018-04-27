@@ -62,7 +62,7 @@ function applyBlueTheme()
     propertycontainer.listDividerColor = "#66000000"
     propertycontainer.detailTextColor = "#b2b2b2"
     propertycontainer.textColor = "white"
-    propertycontainer.settingGradientUp = "#002966"//"#9999ff"
+    propertycontainer.settingGradientUp = "#002966"
     propertycontainer.mainBgImage = "../assets/blue-bg.jpg"
     propertycontainer.defaultCoverArt = "../assets/bat-blue.jpg"
     propertycontainer.settingBgImage = propertycontainer.defaultCoverArt

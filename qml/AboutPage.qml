@@ -61,7 +61,7 @@ Page
             {
                 id: code
                 anchors.horizontalCenter: parent.horizontalCenter
-                text: "This App is written in Qt/QML/V-Play"
+                text: "This App is written in <b>QML/JS/C++<b>"
             }
             AppText
             {
@@ -70,26 +70,12 @@ Page
                 text: "(for educational purpose only)"
                 color: "blue"
             }
-            AppText
-            {
-                id: note
-                anchors.horizontalCenter: parent.horizontalCenter
-                color: "red"
-                text: "<b>Note:</b> place your music files"
-            }
-            AppText
-            {
-                id: notehalf
-                anchors.horizontalCenter: parent.horizontalCenter
-                color: "red"
-                text: "to internal storage's Music folder"
-            }
 
             AppText
             {
                 id: source
                 anchors.horizontalCenter: parent.horizontalCenter
-                text: "There is no copyright or any other issue"
+                text: "There is no copyright or any other issue."
             }
             Row
             {

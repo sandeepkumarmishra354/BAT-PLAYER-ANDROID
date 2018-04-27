@@ -68,6 +68,7 @@ Item {
     property int currentSongIndex: 0
     property bool ifCoverArt: false
     property bool ifMainImageOn: true
+    property bool isLoading: true
     property string remTime: "00:00"
     property string totalTime: "00:00"
     property string currentSongName: ""
