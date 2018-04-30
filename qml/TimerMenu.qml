@@ -4,11 +4,14 @@ import VPlayApps 1.0
 import QtQuick.Controls.Material 2.1
 import QtQuick.Extras 1.4
 import QtQuick.Controls.Styles 1.4
-import "AppLogic.js" as LOGIC
+import "JS/AppLogic.js" as LOGIC
 
 Menu
 {
-    property int timerInterval
+    property int timerInterval: 0
+    property int sliderValue: 0
+    property int gaugeLastValue: 0
+    property bool sliderEnable: true
     id: mainTimerMenu
     opacity: 0.0
     Behavior on opacity {
@@ -21,133 +24,163 @@ Menu
         border.width: 1
         border.color: propertycontainer.lightPink
         color: Qt.rgba(0,0,0, 0.75)
+
         Rectangle
         {
-            id: timerRect
+            id: gaugeRect
             width: parent.width
-            height: parent.height/2+25
-            color:  "transparent"
-            Rectangle
-            {
-                id: hrtumblerRect
-                height: timerRect.height
-                width: timerRect.width/2 - 5
-                anchors.left: parent.left
-                color:  "transparent"
-                HourTumbler
-                {
-                    id: hrtumbler
-                    anchors.fill: parent
-                }
-            }
-            Rectangle
-            {
-                id: timerIndicator
-                anchors.left: hrtumblerRect.right
-                anchors.right: mintumblerRect.left
-                anchors.bottom: hrtumblerRect.bottom
-                height: 0
-                gradient: propertycontainer.sidebarGradient
+            height: parent.height/2 + parent.height/5
+            color: propertycontainer.fullTransparent
+        }
 
-                NumberAnimation
-                {
-                    id: clranime
-                    target: timerIndicator
-                    property: "height"
-                    from: 0
-                    to: hrtumblerRect.height
-                    duration: 20000
-                }
-                NumberAnimation
-                {
-                    id: clranimeStop
-                    target: timerIndicator
-                    property: "height"
-                    from: timerIndicator.height
-                    to: 0
-                    duration: 800
-                }
-            }
-
-            Rectangle
+        CircularGauge
+        {
+            id: circulargauge
+            anchors.fill: gaugeRect
+            minimumValue: 0
+            maximumValue: 60
+            stepSize: 0.1
+            onValueChanged:
             {
-                id: mintumblerRect
-                height: timerRect.height
-                width: timerRect.width/2 - 5
-                anchors.right: parent.right
-                color:  "transparent"
-                MinuteTumbler
-                {
-                    id: mintumbler
-                    anchors.fill: parent
-                }
+                console.log(value)
             }
+        }
+
+        NumberAnimation
+        {
+            id: gaugeAnime
+            target: circulargauge
+            property: "value"
+            from: mainTimerMenu.gaugeLastValue
+            to: 0
+            duration: mainTimerMenu.gaugeLastValue*60*1000
+        }
+        NumberAnimation
+        {
+            id: gaugeResetAnime
+            target: circulargauge
+            property: "value"
+            from: circulargauge.value
+            to: 0
+            duration: 500
         }
 
         Rectangle
         {
-            id: btnRect
+            id: controlRect
             width: parent.width
-            anchors.top: timerRect.bottom
+            anchors.top: gaugeRect.bottom
             anchors.bottom: parent.bottom
-            color:  "transparent"
-            AppText
+            color: propertycontainer.fullTransparent
+            Rectangle
             {
-                id: hrminText
-                anchors.horizontalCenter: parent.horizontalCenter
-                color: propertycontainer.lightPink
-                text:
+                id: sliderRect
+                width: parent.width
+                height: parent.height/2.5
+                color: propertycontainer.fullTransparent
+                AppSlider
                 {
-                    var hr = hrtumbler.getCurrentIndex()
-                    var mn = mintumbler.getCurrentIndex()
-                    var txt = qsTr("Hr. %1 Min. %2").arg(hr).arg(mn)
-                    return txt
+                    id: appslider
+                    anchors.centerIn: parent
+                    to: 60
+                    stepSize: 1.0
+                    tintedTrackColor: (enabled ? propertycontainer.lightPink : propertycontainer.darkColor)
+                    knobColor: propertycontainer.darkColor
+                    enabled: mainTimerMenu.sliderEnable
+                    onValueChanged:
+                    {
+                        circulargauge.value = value
+                        mainTimerMenu.sliderValue = value
+                    }
+                }
+                NumberAnimation
+                {
+                    id: sliderResetAnime
+                    target: appslider
+                    property: "value"
+                    from: appslider.value
+                    to: 0
+                    duration: 500
                 }
             }
-
-            Row
+            Rectangle
             {
-                anchors.centerIn: parent
-                IconButton
+                id: othercontrolRect
+                width: parent.width
+                anchors.top: sliderRect.bottom
+                anchors.bottom: parent.bottom
+                color: propertycontainer.fullTransparent
+                Row
                 {
-                    id: onoffbtn
-                    icon: IconType.play
-                    color: propertycontainer.lightPink
-                    Behavior on opacity
+                    anchors.centerIn: parent
+                    AppText
                     {
-                        NumberAnimation { duration: 500 }
+                        text:
+                        {
+                            if(mainTimerMenu.sliderValue < 10)
+                                return qsTr("TT 0%1").arg(mainTimerMenu.sliderValue)
+                            else
+                                return qsTr("TT %1").arg(mainTimerMenu.sliderValue)
+                        }
+                        font.pixelSize: sp(12)
                     }
-                    Behavior on visible
+                    IconButton
                     {
-                        NumberAnimation { duration: 500 }
+                        icon: IconType.play
+                        disabledColor: propertycontainer.darkColor
+                        color: propertycontainer.lightPink
+                        enabled: mainTimerMenu.sliderEnable
+                        onClicked:
+                        {
+                            if(circulargauge.value > 0)
+                            {
+                                mainTimerMenu.gaugeLastValue = circulargauge.value
+                                gaugeAnime.start()
+                                quitTimer.start()
+                                mainTimerMenu.sliderEnable = false
+                            }
+                        }
                     }
-
-                    onClicked: LOGIC.timerOnOffClicked()
-                }
-                IconButton
-                {
-                    id: stopbtn
-                    icon: IconType.stop
-                    color: "red"
-                    onClicked: LOGIC.timerStopClicked()
-                }
-                IconButton
-                {
-                    id: restart
-                    icon: IconType.repeat
-                    color: propertycontainer.lightPink
-                    onClicked:
+                    IconButton
                     {
-                        quittimer.restart()
-                        clranime.restart()
+                        icon: IconType.stop
+                        color: propertycontainer.lightPink
+                        disabledColor: propertycontainer.darkColor
+                        enabled: !mainTimerMenu.sliderEnable
+                        onClicked:
+                        {
+                            quitTimer.stop()
+                            gaugeAnime.stop()
+                            gaugeResetAnime.start()
+                            sliderResetAnime.start()
+                            circulargauge.value = 0
+                            mainTimerMenu.sliderEnable = true
+                        }
+                    }
+                    AppText
+                    {
+                        text:
+                        {
+                            var tt = circulargauge.value
+                            if(tt < 10)
+                                return qsTr("RT 0%1").arg(tt)
+                            else
+                                return qsTr("RT %1").arg(tt)
+                        }
+                        font.pixelSize: sp(12)
                     }
                 }
             }
-            Timer
+        }
+
+        Timer
+        {
+            id: quitTimer
+            interval: mainTimerMenu.gaugeLastValue*60*1000
+            onTriggered:
             {
-                id: quittimer
-                interval: timerInterval
-                onTriggered: { LOGIC.saveData(); Qt.quit() }
+                LOGIC.saveData()
+                Qt.quit()
             }
         }
     }

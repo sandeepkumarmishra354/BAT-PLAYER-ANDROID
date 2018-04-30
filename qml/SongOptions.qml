@@ -1,7 +1,7 @@
 import QtQuick 2.9
 import QtQuick.Controls 2.2
 import VPlayApps 1.0
-import "AppLogic.js" as LOGIC
+import "JS/AppLogic.js" as LOGIC
 
 Menu
 {
@@ -22,7 +22,8 @@ Menu
                 {text: "Play", icon: IconType.play},
                 {text: "Add to playlist", icon: IconType.pluscircle},
                 {text: "Share", icon: IconType.share},
-                {text: "Delete", icon: IconType.remove}
+                {text: "Delete", icon: IconType.remove},
+                {text: "Add to queue", icon: IconType.forward}
             ]
             delegate: SimpleRow
             {

@@ -1,6 +1,6 @@
 import QtQuick 2.0
 import VPlayApps 1.0
-import "AppLogic.js" as LOGIC
+import "JS/AppLogic.js" as LOGIC
 
 Rectangle
 {

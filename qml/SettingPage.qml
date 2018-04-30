@@ -3,7 +3,7 @@ import VPlayApps 1.0
 import QtQuick.Layouts 1.3
 import QtQuick.Dialogs 1.0
 import QtGraphicalEffects 1.0
-import "ThemeLogic.js" as THEMELOGIC
+import "JS/ThemeLogic.js" as THEMELOGIC
 
 Page
 {

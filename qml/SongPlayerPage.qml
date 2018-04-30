@@ -3,7 +3,7 @@ import VPlayApps 1.0
 import QtMultimedia 5.8
 import QtQuick.Controls 1.2
 import QtGraphicalEffects 1.0
-import "AppLogic.js" as LOGIC
+import "JS/AppLogic.js" as LOGIC
 
 Page
 {
@@ -24,7 +24,7 @@ Page
                 property: "opacity"
                 from: 0.0
                 to: 1.0
-                duration: 500
+                duration: 1000
             }
         }
     }

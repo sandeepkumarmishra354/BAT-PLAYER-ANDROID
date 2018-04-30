@@ -3,7 +3,7 @@ import QtQuick.Controls 2.2 as QQCONTROL
 import VPlayApps 1.0
 import QtMultimedia 5.8
 import QtGraphicalEffects 1.0
-import "AppLogic.js" as LOGIC
+import "JS/AppLogic.js" as LOGIC
 
 Page
 {

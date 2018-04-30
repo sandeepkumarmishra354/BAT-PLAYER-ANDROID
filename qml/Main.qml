@@ -10,8 +10,8 @@ import RemoveFile 1.0 // c++ class
 import MediaExtractor 1.0 // c++ class
 import FileReader 1.0 // c++ class
 import ReadThread 1.0 // c++ class
-import "AppLogic.js" as LOGIC
-import "ThemeLogic.js" as THEMELOGIC
+import "JS/AppLogic.js" as LOGIC
+import "JS/ThemeLogic.js" as THEMELOGIC
 
 App {
     id: root

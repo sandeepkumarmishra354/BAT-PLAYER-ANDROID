@@ -1,7 +1,7 @@
 import QtQuick 2.9
 import VPlayApps 1.0
 import QtQuick.Controls 2.2
-import "AppLogic.js" as LOGIC
+import "JS/AppLogic.js" as LOGIC
 
 Page
 {

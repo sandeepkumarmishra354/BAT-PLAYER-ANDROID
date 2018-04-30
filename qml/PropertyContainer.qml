@@ -24,7 +24,7 @@ Item {
     property string textColor: "white"
     property string fullTransparent: "transparent"
     property string settingGradientUp: "#212121"
-    property string settingGradientDown: "#003300"
+    property string settingGradientDown: "white"//"#003300"
     property var transparentRgbColor: Qt.rgba(0,0,0, 0.75)
     property Gradient sidebarGradient: Gradient
     {
@@ -35,14 +35,14 @@ Item {
     {
         GradientStop {
             id: upGrd
-            position: 0.4; color: settingGradientUp
+            position: 0.6; color: settingGradientUp
             Behavior on color {
                 ColorAnimation {duration: 1000}
             }
         }
         GradientStop {
             id: dwnGrd
-            position: 1.0; color: settingGradientDown
+            position: 1.7; color: settingGradientDown
             Behavior on color {
                 ColorAnimation {duration: 1000}
             }
@@ -61,21 +61,22 @@ Item {
     property real pageTotalWidth: 0.0
     property real pageProgressWidth: 0.0
     property real tmpProgressWidth: 0.0
-    property string pIcon: IconType.play
-    property var songRow: undefined
     property int totalDuration: 0
-    property bool isFirstTime: true
     property int currentSongIndex: 0
+    property int selectedSongIndex: -1
+    property int currentQueue
     property bool ifCoverArt: false
     property bool ifMainImageOn: true
     property bool isLoading: true
+    property bool isQueueEmpty: true
+    property bool isFirstTime: true
+    property string pIcon: IconType.play
     property string remTime: "00:00"
     property string totalTime: "00:00"
     property string currentSongName: ""
     property string selectedSongPath: ""
     property string selectedSongName: ""
     property string currentPlayingArtist: ""
-    property int selectedSongIndex: -1
     property string noPlaylistText: "No playlist found, to create one long press on any song "+
                                      "and select 'Add to playlist'"
     // license key
@@ -93,4 +94,6 @@ Item {
                                 744CDAF97ADD653672CB9165AEAD8A9EE6B8E6D23AA0F
                                 FDAB3A6D6E5ECB64BCBCD64CC434734B00A015546B4C6
                                 13246ECA3BE90B893F8815D"
+    property var songRow: undefined
+    property var queueList: []
 }
